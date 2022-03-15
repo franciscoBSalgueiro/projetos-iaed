@@ -8,14 +8,22 @@
 int main()
 {
 	Global_State global;
-    global.airports_count = 0;
+	Date initial_date;
+
+	initial_date.day = 1;
+	initial_date.month = 1;
+	initial_date.year = 2022;
+
+	global.airports_count = 0;
+	global.date = initial_date;
 	while (commands(&global)) { }
 	return 0;
 }
 
 int commands(Global_State* global)
 {
-	char c = getchar();
+	char c;
+	c = getchar();
 	switch (c) {
 	case 'q':
 		return 0;
@@ -35,7 +43,7 @@ int commands(Global_State* global)
 		printf("alright\n");
 		return 1;
 	case 't':
-		printf("alright\n");
+		change_date(global);
 		return 1;
 	default:
 		return 1;
@@ -49,38 +57,39 @@ int add_airport(Global_State* global)
 	char city[MAX_CITY_NAME_LENGTH];
 	Airport airport;
 
-    if (global->airports_count==40) {
-        printf(TOO_MANY_AIPORTS);
-        return -1;
-    }
-    if (get_airport(global, airportID)) {
-        printf(DUPLICATE_AIRPORT);
-        return -2;
-    }
 	scanf("%s", airportID);
 	scanf("%s", country);
-	scanf(" %[^\n]", city);
+	scanf(" %s[^\n]", city);
+
+	if (global->airports_count == MAX_AIRPORTS) {
+		printf(TOO_MANY_AIPORTS);
+		return -1;
+	}
+	if (get_airport(global, airportID)) {
+		printf(DUPLICATE_AIRPORT);
+		return -2;
+	}
 
 	strcpy(airport.id, airportID);
 	strcpy(airport.city, city);
 	strcpy(airport.country, country);
 
 	global->airports[global->airports_count] = airport;
-    global->airports_count++;
+	global->airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airportID);
 	return 0;
 }
 
-int get_airport(Global_State* global, char* id) {
-    int i;
-    printf("%s",id);
-    for (i = 0; i<global->airports_count; i++) {
-        if (global->airports[i].id==id) {
-            return 1;
-        }
-    }
-    return 0;
+int get_airport(Global_State* global, char* id)
+{
+	int i;
+	for (i = 0; i < global->airports_count; i++) {
+		if (strcmp(global->airports[i].id, id) == 0) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int list_airports(Global_State* global)
@@ -91,5 +100,26 @@ int list_airports(Global_State* global)
 		airport = global->airports[i];
 		printf(AIRPORT_STRING, airport.id, airport.city, airport.country);
 	}
+	return 0;
+}
+
+int change_date(Global_State* global)
+{
+	Date date;
+	int year;
+	int month;
+	int day;
+
+	scanf("%d%*c", &day);
+	scanf("%d%*c", &month);
+	scanf("%d", &year);
+
+	date.year = year;
+	date.month = month;
+	date.day = day;
+
+	global->date = date;
+
+	printf("%02d-%02d-%04d\n", day, month, year);
 	return 0;
 }
