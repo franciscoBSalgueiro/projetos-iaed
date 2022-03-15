@@ -45,10 +45,10 @@ typedef struct Flight {
 
 
 typedef struct Global_State {
-    Airport airports[MAX_AIRPORTS];
     int airports_count;
-    Flight flights[MAX_FLIGHTS];
     int flights_count;
+    Airport airports[MAX_AIRPORTS];
+    Flight flights[MAX_FLIGHTS];
     Date date;    
 } Global_State;
 

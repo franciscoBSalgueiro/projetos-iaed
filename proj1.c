@@ -52,6 +52,7 @@ int commands(Global_State* global)
 
 int add_airport(Global_State* global)
 {
+	int i;
 	char airportID[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
@@ -68,6 +69,12 @@ int add_airport(Global_State* global)
 	if (get_airport(global, airportID)) {
 		printf(DUPLICATE_AIRPORT);
 		return -2;
+	}
+	for (i = 0; i < strlen(airportID); i++) {
+		if (!isupper((airportID[i]))) {
+			printf(INVALID_AIRPORT_ID);
+			return -3;
+		}
 	}
 
 	strcpy(airport.id, airportID);
@@ -117,6 +124,8 @@ int change_date(Global_State* global)
 	date.year = year;
 	date.month = month;
 	date.day = day;
+
+	/* TODO verify dates*/
 
 	global->date = date;
 
