@@ -62,19 +62,19 @@ int add_airport(Global_State* global)
 	scanf("%s", country);
 	scanf(" %s[^\n]", city);
 
+	for (i = 0; i < strlen(airportID); i++) {
+		if (!isupper((airportID[i]))) {
+			printf(INVALID_AIRPORT_ID);
+			return -1;
+		}
+	}
 	if (global->airports_count == MAX_AIRPORTS) {
 		printf(TOO_MANY_AIPORTS);
 		return -1;
 	}
 	if (get_airport(global, airportID) >= 0) {
 		printf(DUPLICATE_AIRPORT);
-		return -2;
-	}
-	for (i = 0; i < strlen(airportID); i++) {
-		if (!isupper((airportID[i]))) {
-			printf(INVALID_AIRPORT_ID);
-			return -3;
-		}
+		return -1;
 	}
 
 	strcpy(airport.id, airportID);
@@ -90,7 +90,7 @@ int add_airport(Global_State* global)
 
 int add_flight(Global_State* global)
 {
-	char id[FLIGHT_ID_LENGTH];
+	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
 	char arrival_id[AIRPORT_ID_LENGTH];
 	Date departure_date;
@@ -106,7 +106,7 @@ int add_flight(Global_State* global)
 		list_flights(global);
 		return 0;
 	}
-	scanf("%s", id);
+	scanf("%s", flight_id);
 	scanf("%s", arrival_id);
 	scanf("%s", departure_id);
 	scanf("%d%*c", &day);
@@ -122,7 +122,7 @@ int add_flight(Global_State* global)
 	departure_time.hours = hour;
 	departure_time.minutes = minutes;
 
-	if (check_flight_id(id)) {
+	if (check_flight_id(flight_id)) {
 		printf(INVALID_FLIGHT);
 		return -1;
 	}
@@ -152,7 +152,7 @@ int add_flight(Global_State* global)
 		return -1;
 	}
 
-	strcpy(flight.id, id);
+	strcpy(flight.id, flight_id);
 	flight.arrival = global->airports[get_airport(global, arrival_id)];
 	flight.departure = global->airports[get_airport(global, departure_id)];
 	flight.date = departure_date;
@@ -210,15 +210,15 @@ void sort_airports(Airport airports[], int num_airports)
 int check_flight_id(char* id)
 {
 	size_t i;
-	size_t lenght_id;
-	lenght_id = strlen(id);
-	if (lenght_id < 3 || lenght_id > 6) {
+	size_t length_id;
+	length_id = strlen(id);
+	if (length_id < 3 || length_id > 6) {
 		return 1;
 	}
 	if (id[0] < 'A' || id[0] > 'Z' || id[1] < 'A' || id[1] > 'Z') {
 		return 1;
 	}
-	for (i = 2; i < lenght_id; i++) {
+	for (i = 2; i < length_id; i++) {
 		if (id[i] < '0' || id[i] > '9') {
 			return 1;
 		}
@@ -241,11 +241,30 @@ int get_airport(Global_State* global, char* id)
 int list_airports(Global_State* global)
 {
 	int i;
+	char c;
+	char airportID[AIRPORT_ID_LENGTH];
 	Airport airport;
-	sort_airports(global->airports, global->airports_count);
-	for (i = 0; i < global->airports_count; i++) {
-		airport = global->airports[i];
-		printf(AIRPORT_STRING, airport.id, airport.city, airport.country);
+
+	c = getchar();
+	if (c == '\n') {
+		sort_airports(global->airports, global->airports_count);
+		for (i = 0; i < global->airports_count; i++) {
+			airport = global->airports[i];
+			printf(AIRPORT_STRING, airport.id, airport.city, airport.country);
+		}
+	} else {
+		while (scanf("%s", airportID) != EOF) {
+			i = get_airport(global, airportID);
+			if (i == -1) {
+				printf(NO_SUCH_AIRPORT, airportID);
+				return -1;
+			}
+			airport = global->airports[i];
+			printf(AIRPORT_STRING, airport.id, airport.city, airport.country);
+			if (getchar() == '\n') {
+				break;
+			}
+		}
 	}
 	return 0;
 }
