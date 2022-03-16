@@ -56,6 +56,7 @@ typedef struct Global_State {
 
 int commands(Global_State* global);
 int add_airport(Global_State* global);
+int add_flight(Global_State* global);
 int list_airports(Global_State* global);
 int get_airport(Global_State* global, char* id);
 int change_date(Global_State* global);

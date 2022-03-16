@@ -34,7 +34,7 @@ int commands(Global_State* global)
 		list_airports(global);
 		return 1;
 	case 'v':
-		printf("alright\n");
+		add_flight(global);
 		return 1;
 	case 'p':
 		printf("alright\n");
@@ -93,16 +93,18 @@ int add_flight(Global_State* global)
 	char id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
 	char arrival_id[AIRPORT_ID_LENGTH];
-	char departure_date;
-	char departure_time;
+	int day, month, year, hour, minutes;
 	int duration;
 	int capacity;
 
 	scanf("%s", id);
 	scanf("%s", arrival_id);
 	scanf("%s", departure_id);
-	scanf("%s", departure_time);
-	scanf("%s", departure_time);
+	scanf("%d%*c", &day);
+	scanf("%d%*c", &month);
+	scanf("%d", &year);
+	scanf("%d%*c", &hour);
+	scanf("%d", &minutes);
 	scanf("%d", &duration);
 	scanf("%d", &capacity);
 
@@ -146,9 +148,7 @@ int list_airports(Global_State* global)
 int change_date(Global_State* global)
 {
 	Date date;
-	int year;
-	int month;
-	int day;
+	int year, month, day;
 
 	scanf("%d%*c", &day);
 	scanf("%d%*c", &month);
