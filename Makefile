@@ -1,4 +1,4 @@
-CFLAGS= -g -O2 -Wall -pedantic -ansi
+CFLAGS= -Wall -Wextra -Werror -ansi -pedantic
 FILE = proj1
 
 run : 

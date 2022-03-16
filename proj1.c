@@ -52,7 +52,7 @@ int commands(Global_State* global)
 
 int add_airport(Global_State* global)
 {
-	int i;
+	size_t i;
 	char airportID[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
@@ -85,6 +85,39 @@ int add_airport(Global_State* global)
 	global->airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airportID);
+	return 0;
+}
+
+int add_flight(Global_State* global)
+{
+	char id[FLIGHT_ID_LENGTH];
+	char departure_id[AIRPORT_ID_LENGTH];
+	char arrival_id[AIRPORT_ID_LENGTH];
+	char departure_date;
+	char departure_time;
+	int duration;
+	int capacity;
+
+	scanf("%s", id);
+	scanf("%s", arrival_id);
+	scanf("%s", departure_id);
+	scanf("%s", departure_time);
+	scanf("%s", departure_time);
+	scanf("%d", &duration);
+	scanf("%d", &capacity);
+
+	if (global->flights_count == MAX_FLIGHTS) {
+		printf(TOO_MANY_FLIGHTS);
+		return -1;
+	}
+	if (duration > 12) {
+		printf(INVALID_DURATION);
+		return -1;
+	}
+	if (capacity < 10 || capacity > 100) {
+		printf(INVALID_CAPACITY);
+		return -1;
+	}
 	return 0;
 }
 

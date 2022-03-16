@@ -8,7 +8,11 @@
 
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
+#define INVALID_DATE "invalid date\n"
+#define INVALID_DURATION "invalid duration\n"
+#define INVALID_CAPACITY "invalid capacity\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
+#define TOO_MANY_FLIGHTS "too many flights\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
 
 /* MESSAGES */
@@ -20,7 +24,6 @@ typedef struct Airport {
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
 } Airport;
-
 
 typedef struct Date {
 	int year;
@@ -40,16 +43,15 @@ typedef struct Flight {
 	Date date;
 	Time time;
 	int duration;
-	int passengers;
+	int capacity;
 } Flight;
 
-
 typedef struct Global_State {
-    int airports_count;
-    int flights_count;
-    Airport airports[MAX_AIRPORTS];
-    Flight flights[MAX_FLIGHTS];
-    Date date;    
+	int airports_count;
+	int flights_count;
+	Airport airports[MAX_AIRPORTS];
+	Flight flights[MAX_FLIGHTS];
+	Date date;
 } Global_State;
 
 int commands(Global_State* global);
