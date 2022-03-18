@@ -9,16 +9,17 @@
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
 #define INVALID_DATE "invalid date\n"
-#define INVALID_FLIGHT "invalid flight\n"
+#define INVALID_FLIGHT "invalid flight code\n"
 #define INVALID_DURATION "invalid duration\n"
 #define INVALID_CAPACITY "invalid capacity\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
 #define TOO_MANY_FLIGHTS "too many flights\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
 #define NO_SUCH_AIRPORT "%s: no such airport ID\n"
+#define FLIGHT_ALREADY_EXISTS "flight already exists\n"
 
 /* MESSAGES */
-#define AIRPORT_STRING "%s %s %s\n"
+#define AIRPORT_STRING "%s %s %s %d\n"
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
@@ -45,7 +46,7 @@ typedef struct Flight {
 	Airport arrival;
 	Date date;
 	Time time;
-	int duration;
+	Time duration;
 	int capacity;
 } Flight;
 
@@ -63,6 +64,8 @@ int add_flight(Global_State* global);
 int list_airports(Global_State* global);
 int list_flights(Global_State* global, char mode);
 int check_flight_id(char* id);
+int get_flight(Global_State* global, char* id, Date date);
+int get_num_flights(Global_State* global, char* id);
 int get_airport(Global_State* global, char* id);
 int change_date(Global_State* global);
 int compare_dates(Date date1, Date date2);
