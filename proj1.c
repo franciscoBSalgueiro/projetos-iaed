@@ -10,12 +10,15 @@ int main()
 	Global_State global;
 	Date initial_date;
 
+	/* Set initial state */
 	initial_date.day = 1;
 	initial_date.month = 1;
 	initial_date.year = 2022;
 
 	global.airports_count = 0;
+	global.flights_count = 0;
 	global.date = initial_date;
+
 	while (commands(&global)) { }
 	return 0;
 }
