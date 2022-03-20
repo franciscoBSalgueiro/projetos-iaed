@@ -24,6 +24,8 @@
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
+static const int DAYS_BY_MONTH[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
 typedef struct Airport {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -75,6 +77,7 @@ int get_airport(Global_State* global, char* id);
 int change_date(Global_State* global);
 int compare_dates(Date date1, Date date2);
 int compare_time(Time time1, Time time2);
+int compare_date_and_time(Date date1, Date date2, Time time1, Time time2);
 void print_date(Date date);
 void print_time(Time time);
 Time sum_time(Time time, Time duration);

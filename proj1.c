@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main()
-{
+int main() {
 	Global_State global;
 	Date initial_date;
 
@@ -19,43 +18,42 @@ int main()
 	global.flights_count = 0;
 	global.date = initial_date;
 
-	while (commands(&global)) { }
+	while (commands(&global)) {
+	}
 	return 0;
 }
 
 /* handles commands, returns 0 to quit program */
-int commands(Global_State* global)
-{
+int commands(Global_State* global) {
 	char c;
 	c = getchar();
 	switch (c) {
-	case 'q':
-		return 0;
-	case 'a':
-		add_airport(global);
-		return 1;
-	case 'l':
-		list_airports(global);
-		return 1;
-	case 'v':
-		add_flight(global);
-		return 1;
-	case 'p':
-		list_flights(global, 'p');
-		return 1;
-	case 'c':
-		list_flights(global, 'c');
-		return 1;
-	case 't':
-		change_date(global);
-		return 1;
-	default:
-		return 1;
+		case 'q':
+			return 0;
+		case 'a':
+			add_airport(global);
+			return 1;
+		case 'l':
+			list_airports(global);
+			return 1;
+		case 'v':
+			add_flight(global);
+			return 1;
+		case 'p':
+			list_flights(global, 'p');
+			return 1;
+		case 'c':
+			list_flights(global, 'c');
+			return 1;
+		case 't':
+			change_date(global);
+			return 1;
+		default:
+			return 1;
 	}
 }
 
-int add_airport(Global_State* global)
-{
+int add_airport(Global_State* global) {
 	size_t i;
 	char airportID[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -64,7 +62,7 @@ int add_airport(Global_State* global)
 
 	scanf("%s", airportID);
 	scanf("%s", country);
-	scanf(" %[^\n]", city);
+	scanf(" %[^\n]", city); /* includes everything until end of line */
 
 	for (i = 0; i < strlen(airportID); i++) {
 		if (!isupper((airportID[i]))) {
@@ -96,8 +94,7 @@ int add_airport(Global_State* global)
 	return 0;
 }
 
-int add_flight(Global_State* global)
-{
+int add_flight(Global_State* global) {
 	int i;
 	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
@@ -161,8 +158,8 @@ int add_flight(Global_State* global)
 
 	future_date = global->date;
 	future_date.year++;
-	if (compare_dates(departure_date, global->date) < 0
-		|| compare_dates(departure_date, future_date) > 0) {
+	if (compare_dates(departure_date, global->date) < 0 ||
+		compare_dates(departure_date, future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
@@ -184,7 +181,7 @@ int add_flight(Global_State* global)
 	flight.capacity = capacity;
 
 	arrival_time = sum_time(departure_time, duration);
-	if(arrival_time.hours>=24) {
+	if (arrival_time.hours >= 24) {
 		arrival_time.hours -= 24;
 		arrival_date = increment_date(departure_date);
 	} else {
@@ -193,27 +190,27 @@ int add_flight(Global_State* global)
 
 	flight.arrival_date = arrival_date;
 	flight.arrival_time = arrival_time;
-	
+
 	global->flights[global->flights_count] = flight;
 	global->flights_count++;
 
-	for (i = global->flights_count - 1; i > 0
-		 && (compare_dates(arrival_date, global->sorted_flights_arr[i - 1]->arrival_date) < 0
-			 || (compare_dates(arrival_date, global->sorted_flights_arr[i - 1]->arrival_date) == 0
-				 && compare_time(
-						arrival_time, global->sorted_flights_arr[i - 1]->arrival_time)
-					 < 0));
+	for (i = global->flights_count - 1;
+		 i > 0 &&
+		 (compare_date_and_time(
+			  arrival_date, global->sorted_flights_arr[i - 1]->arrival_date,
+			  arrival_time,
+			  global->sorted_flights_arr[i - 1]->arrival_time) < 0);
 		 i--) {
 		global->sorted_flights_arr[i] = global->sorted_flights_arr[i - 1];
 	}
 	global->sorted_flights_arr[i] = &global->flights[global->flights_count - 1];
 
-	for (i = global->flights_count - 1; i > 0
-		 && (compare_dates(departure_date, global->sorted_flights_dep[i - 1]->departure_date) < 0
-			 || (compare_dates(departure_date, global->sorted_flights_dep[i - 1]->departure_date) == 0
-				 && compare_time(
-						departure_time, global->sorted_flights_dep[i - 1]->departure_time)
-					 < 0));
+	for (i = global->flights_count - 1;
+		 i > 0 &&
+		 (compare_date_and_time(
+			  departure_date, global->sorted_flights_dep[i - 1]->departure_date,
+			  departure_time,
+			  global->sorted_flights_dep[i - 1]->departure_time) < 0);
 		 i--) {
 		global->sorted_flights_dep[i] = global->sorted_flights_dep[i - 1];
 	}
@@ -224,8 +221,7 @@ int add_flight(Global_State* global)
 
 /* Returns -1 if date1 happens before date2, 0 if the dates are equal and 1 if
  * date1 happens after date2 */
-int compare_dates(Date date1, Date date2)
-{
+int compare_dates(Date date1, Date date2) {
 	if (date1.year < date2.year) {
 		return -1;
 	}
@@ -249,8 +245,7 @@ int compare_dates(Date date1, Date date2)
 
 /* Returns -1 if time1 happens before time2, 0 if the dates are equal and 1 if
  * time1 happens after time2 */
-int compare_time(Time time1, Time time2)
-{
+int compare_time(Time time1, Time time2) {
 	if (time1.hours < time2.hours) {
 		return -1;
 	}
@@ -266,8 +261,22 @@ int compare_time(Time time1, Time time2)
 	return 0;
 }
 
-int check_flight_id(char* id)
-{
+int compare_date_and_time(Date date1, Date date2, Time time1, Time time2) {
+	int d, t;
+	if ((d = compare_dates(date1, date2)) < 0) {
+		return -1;
+	}
+	if (d == 0) {
+		if ((t = compare_time(time1, time2)) < 0) {
+			return -1;
+		} else if (t == 0) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+int check_flight_id(char* id) {
 	size_t i;
 	size_t length_id;
 	length_id = strlen(id);
@@ -286,8 +295,7 @@ int check_flight_id(char* id)
 }
 
 /* returns index of airport or -1 if it doesn't exist */
-int get_airport(Global_State* global, char* id)
-{
+int get_airport(Global_State* global, char* id) {
 	int i;
 	for (i = 0; i < global->airports_count; i++) {
 		if (strcmp(global->airports[i].id, id) == 0) {
@@ -298,20 +306,18 @@ int get_airport(Global_State* global, char* id)
 }
 
 /* returns index of flight or -1 if it doesn't exist */
-int get_flight(Global_State* global, char* id, Date date)
-{
+int get_flight(Global_State* global, char* id, Date date) {
 	int i;
 	for (i = 0; i < global->flights_count; i++) {
-		if (strcmp(global->flights[i].id, id) == 0
-			&& compare_dates(global->flights->departure_date, date) == 0) {
+		if (strcmp(global->flights[i].id, id) == 0 &&
+			compare_dates(global->flights->departure_date, date) == 0) {
 			return i;
 		}
 	}
 	return -1;
 }
 
-int get_num_flights(Global_State* global, char* id)
-{
+int get_num_flights(Global_State* global, char* id) {
 	int i, count;
 	count = 0;
 	for (i = 0; i < global->flights_count; i++) {
@@ -322,8 +328,7 @@ int get_num_flights(Global_State* global, char* id)
 	return count;
 }
 
-int list_airports(Global_State* global)
-{
+int list_airports(Global_State* global) {
 	int i, num_flights;
 	char c;
 	char airportID[AIRPORT_ID_LENGTH];
@@ -335,7 +340,7 @@ int list_airports(Global_State* global)
 			airport = global->airports[i];
 			num_flights = get_num_flights(global, airport.id);
 			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
-				num_flights);
+				   num_flights);
 		}
 	} else {
 		while (scanf("%s", airportID) != EOF) {
@@ -347,7 +352,7 @@ int list_airports(Global_State* global)
 			airport = global->airports[i];
 			num_flights = get_num_flights(global, airport.id);
 			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
-				num_flights);
+				   num_flights);
 			if (getchar() == '\n') {
 				break;
 			}
@@ -356,8 +361,7 @@ int list_airports(Global_State* global)
 	return 0;
 }
 
-int list_flights(Global_State* global, char mode)
-{
+int list_flights(Global_State* global, char mode) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
 	Flight flight;
@@ -373,34 +377,33 @@ int list_flights(Global_State* global, char mode)
 	for (i = 0; i < global->flights_count; i++) {
 		if (mode == 'n') {
 			flight = global->flights[i];
-		}
-		else if (mode == 'c') {
+		} else if (mode == 'c') {
 			flight = *global->sorted_flights_arr[i];
 		} else {
 			flight = *global->sorted_flights_dep[i];
 		}
-		if (mode == 'n'
-			|| (mode == 'c' && strcmp(flight.arrival.id, airport_id) == 0)
-			|| (mode == 'p' && strcmp(flight.departure.id, airport_id) == 0)) {
+		if (mode == 'n' ||
+			(mode == 'c' && strcmp(flight.arrival.id, airport_id) == 0) ||
+			(mode == 'p' && strcmp(flight.departure.id, airport_id) == 0)) {
 			switch (mode) {
-			case 'c':
-				printf(FLIGHT_STRING_REDUCED, flight.id, flight.departure.id);
-				break;
-			case 'p':
-				printf(FLIGHT_STRING_REDUCED, flight.id, flight.arrival.id);
-				break;
-			default:
-				printf(FLIGHT_STRING, flight.id, flight.departure.id,
-					flight.arrival.id);
-				break;
+				case 'c':
+					printf(FLIGHT_STRING_REDUCED, flight.id,
+						   flight.departure.id);
+					break;
+				case 'p':
+					printf(FLIGHT_STRING_REDUCED, flight.id, flight.arrival.id);
+					break;
+				default:
+					printf(FLIGHT_STRING, flight.id, flight.departure.id,
+						   flight.arrival.id);
+					break;
 			}
 			if (mode == 'c') {
 				print_date(flight.arrival_date);
 				putchar(' ');
 				print_time(flight.arrival_time);
 				putchar('\n');
-			}
-			else {
+			} else {
 				print_date(flight.departure_date);
 				putchar(' ');
 				print_time(flight.departure_time);
@@ -411,8 +414,7 @@ int list_flights(Global_State* global, char mode)
 	return 0;
 }
 
-int change_date(Global_State* global)
-{
+int change_date(Global_State* global) {
 	Date date;
 	Date future_date;
 	int year, month, day;
@@ -427,8 +429,8 @@ int change_date(Global_State* global)
 
 	future_date = global->date;
 	future_date.year++;
-	if (compare_dates(date, global->date) < 0
-		|| compare_dates(date, future_date) > 0) {
+	if (compare_dates(date, global->date) < 0 ||
+		compare_dates(date, future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
@@ -440,16 +442,13 @@ int change_date(Global_State* global)
 	return 0;
 }
 
+/* Adds one day to date */
 Date increment_date(Date date) {
 	Date result;
 	result.day = date.day + 1;
 	result.month = date.month;
 	result.year = date.year;
-	if(
-		(result.day>28 && result.month == 2) || 
-		(result.day>30 && (result.month == 4 || result.month == 6 || result.month == 9 || result.month == 11)) ||
-		(result.day>31 && (result.month == 1 || result.month == 3 || result.month == 5 || result.month == 7 || result.month == 8 || result.month == 10 || result.month == 12))
-		) {
+	if (result.day > DAYS_BY_MONTH[result.month - 1]) {
 		result.month++;
 		result.day = 1;
 		if (result.month > 12) {
@@ -460,11 +459,11 @@ Date increment_date(Date date) {
 	return result;
 }
 
-Time sum_time(Time time, Time duration)
-{
+/* Sums two times */
+Time sum_time(Time time1, Time time2) {
 	Time result;
-	result.hours = time.hours + duration.hours;
-	result.minutes = time.minutes + duration.minutes;
+	result.hours = time1.hours + time2.hours;
+	result.minutes = time1.minutes + time2.minutes;
 	if (result.minutes >= 60) {
 		result.hours++;
 		result.minutes -= 60;
@@ -472,9 +471,10 @@ Time sum_time(Time time, Time duration)
 	return result;
 }
 
-void print_date(Date date)
-{
+/* Prints date in formatted form */
+void print_date(Date date) {
 	printf("%02d-%02d-%04d", date.day, date.month, date.year);
 }
 
+/* Prints time in formatted form */
 void print_time(Time time) { printf("%02d:%02d", time.hours, time.minutes); }
