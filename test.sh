@@ -1,10 +1,27 @@
+# Author: Francisco Salgueiro
+
 #!/bin/bash
 
-for infile in ./tests/*.in; do
+if [[ $# -lt 2 ]]; then
+    echo "usage: $0 <relative_path_to_executable> <relative_path_to_tests_dir> <flags>"
+    echo "-v flag to display diff in the terminal"
+    echo "-c flag to remove generated result files"
+    exit
+fi
+
+bin="${1}"
+tests="${2}"
+
+if [ "$3" == "-c" ]; then
+    rm $PWD/$tests/*result
+    exit
+fi
+
+for infile in $PWD/$tests/*.in; do
     basename=${infile%.*}
-    ./$1 < $infile > $basename.result
+    ($PWD/$bin) < $infile > $basename.result
     cmp --silent $basename.result $basename.out || echo "$basename TEST FAILED" 
-    if [ "$2" == "-v" ]; then
+    if [ "$3" == "-v" ]; then
         if ! command -v colordiff &> /dev/null; then
             diff $basename.result $basename.out
         else
@@ -13,7 +30,7 @@ for infile in ./tests/*.in; do
     fi
 done
 
-if [ "$2" == "-v" ]; then
+if [ "$3" == "-v" ]; then
     if ! command -v colordiff &> /dev/null
     then
         echo ""
