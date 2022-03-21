@@ -1,3 +1,9 @@
+/*
+ * File:  proj1.c
+ * Author:  Francisco Salgueiro
+ * Description: A program for creating airports and flights
+*/
+
 #include "proj1.h"
 
 #include <ctype.h>
@@ -53,19 +59,20 @@ int commands(Global_State* global) {
 	}
 }
 
+/* Adds an airport to the global state */
 int add_airport(Global_State* global) {
 	size_t i;
-	char airportID[AIRPORT_ID_LENGTH];
+	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
 	Airport airport;
 
-	scanf("%s", airportID);
+	scanf("%s", airport_id);
 	scanf("%s", country);
 	scanf(" %[^\n]", city); /* includes everything until end of line */
 
-	for (i = 0; i < strlen(airportID); i++) {
-		if (!isupper((airportID[i]))) {
+	for (i = 0; i < strlen(airport_id); i++) {
+		if (!isupper((airport_id[i]))) {
 			printf(INVALID_AIRPORT_ID);
 			return -1;
 		}
@@ -74,26 +81,27 @@ int add_airport(Global_State* global) {
 		printf(TOO_MANY_AIPORTS);
 		return -1;
 	}
-	if (get_airport(global, airportID) >= 0) {
+	if (get_airport(global, airport_id) >= 0) {
 		printf(DUPLICATE_AIRPORT);
 		return -1;
 	}
 
-	strcpy(airport.id, airportID);
+	strcpy(airport.id, airport_id);
 	strcpy(airport.city, city);
 	strcpy(airport.country, country);
 
 	for (i = global->airports_count;
-		 i > 0 && strcmp(airportID, global->airports[i - 1].id) < 0; i--) {
+		 i > 0 && strcmp(airport_id, global->airports[i - 1].id) < 0; i--) {
 		global->airports[i] = global->airports[i - 1];
 	}
 	global->airports[i] = airport;
 	global->airports_count++;
 
-	printf(AIRPORT_ADDED_MESSAGE, airportID);
+	printf(AIRPORT_ADDED_MESSAGE, airport_id);
 	return 0;
 }
 
+/* Adds a flight to the global state */
 int add_flight(Global_State* global) {
 	int i;
 	char flight_id[FLIGHT_ID_LENGTH];
@@ -194,6 +202,7 @@ int add_flight(Global_State* global) {
 	global->flights[global->flights_count] = flight;
 	global->flights_count++;
 
+	/* TODO improve insert sorted */
 	for (i = global->flights_count - 1;
 		 i > 0 &&
 		 (compare_date_and_time(

@@ -1,3 +1,9 @@
+/*
+ * File:  proj1.h
+ * Author:  Francisco Salgueiro
+ * Description: Constants and prototypes for proj1.c
+*/
+
 #define MAX_FLIGHTS 30000
 #define MAX_AIRPORTS 40
 
@@ -26,6 +32,7 @@
 
 static const int DAYS_BY_MONTH[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
 
+/* STRUCTS */
 typedef struct Airport {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -65,6 +72,7 @@ typedef struct Global_State {
 	Date date;
 } Global_State;
 
+/* Function Prototypes */
 int commands(Global_State* global);
 int add_airport(Global_State* global);
 int add_flight(Global_State* global);
