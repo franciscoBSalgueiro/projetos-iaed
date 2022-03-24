@@ -33,6 +33,10 @@
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
+/* ARG FORMATS */
+#define DATE_FORMAT "%d-%d-%d"
+#define TIME_FORMAT "%d:%d"
+
 static const int DAYS_BY_MONTH[12] = {31, 28, 31, 30, 31, 30,
 									  31, 31, 30, 31, 30, 31};
 
