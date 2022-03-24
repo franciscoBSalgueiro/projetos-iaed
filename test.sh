@@ -1,6 +1,6 @@
-# Author: Francisco Salgueiro
-
 #!/bin/bash
+
+# Author: Francisco Salgueiro
 
 if [[ $# -lt 2 ]]; then
     echo "usage: $0 <relative_path_to_executable> <relative_path_to_tests_dir> <flags>"
