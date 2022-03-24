@@ -1,14 +1,12 @@
 /*
  * File:  proj1.c
  * Author:  Francisco Salgueiro
- * Description: A program for creating airports and flights
+ * Description: Main project file
  */
 
 #include "proj1.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int main() {
 	/* Set initial state */

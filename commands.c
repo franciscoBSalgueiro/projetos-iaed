@@ -1,7 +1,14 @@
-#include "proj1.h"
+/*
+ * File:  commands.c
+ * Author:  Francisco Salgueiro
+ * Description: Main project file
+ */
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "proj1.h"
 
 /*----------------------
  |  -A COMMAND
@@ -260,7 +267,6 @@ int add_flight(Global_State* global) {
 
 	return 0;
 }
-
 
 /*----------------------
  |  T COMMAND

@@ -1,7 +1,13 @@
-#include "proj1.h"
+/*
+ * File:  aux.c
+ * Author:  Francisco Salgueiro
+ * Description: Auxiliary functions
+ */
+
 #include <stdio.h>
 #include <string.h>
 
+#include "proj1.h"
 
 /* returns index of airport or negative index-1 if it doesn't exist */
 int get_airport(Global_State* global, char* id) {
@@ -189,7 +195,6 @@ Time sum_time(Time time1, Time time2) {
 	}
 	return result;
 }
-
 
 /*----------------------
  |  READ FUNTIONS
