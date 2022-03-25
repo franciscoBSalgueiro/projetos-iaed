@@ -8,46 +8,40 @@
 
 #include <stdio.h>
 
+/* Declare global variables */
+int airports_count = 0;
+int flights_count = 0;
+Airport airports[MAX_AIRPORTS];
+Flight flights[MAX_FLIGHTS];
+Flight* sorted_flights_dep[MAX_FLIGHTS];
+Flight* sorted_flights_arr[MAX_FLIGHTS];
+Date date = {1, 1, 2022};
+
 int main() {
-	/* Set initial state */
-	Global_State global;
-	Date initial_date = {1, 1, 2022};
-
-	global.airports_count = 0;
-	global.flights_count = 0;
-	global.date = initial_date;
-
-	while (commands(&global)) {
+	char c;
+	while ((c = getchar()) != 'q') {
+		switch (c) {
+			case 'a':
+				add_airport();
+				break;
+			case 'l':
+				list_airports();
+				break;
+			case 'v':
+				add_flight();
+				break;
+			case 'p':
+				list_flights('p');
+				break;
+			case 'c':
+				list_flights('c');
+				break;
+			case 't':
+				change_date();
+				break;
+			default:
+				break;
+		}
 	}
 	return 0;
-}
-
-/* handles commands, returns 0 to quit program */
-int commands(Global_State* global) {
-	char c;
-	c = getchar();
-	switch (c) {
-		case 'q':
-			return 0;
-		case 'a':
-			add_airport(global);
-			return 1;
-		case 'l':
-			list_airports(global);
-			return 1;
-		case 'v':
-			add_flight(global);
-			return 1;
-		case 'p':
-			list_flights(global, 'p');
-			return 1;
-		case 'c':
-			list_flights(global, 'c');
-			return 1;
-		case 't':
-			change_date(global);
-			return 1;
-		default:
-			return 1;
-	}
 }

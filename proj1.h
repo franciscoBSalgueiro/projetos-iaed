@@ -1,7 +1,7 @@
 /*
  * File:  proj1.h
  * Author:  Francisco Salgueiro
- * Description: Constants, structs and prototypes for proj1.c
+ * Description: Constants, globals, structs and prototypes for proj1.c
  */
 
 /* CONSTANTS */
@@ -71,27 +71,24 @@ typedef struct Flight {
 	int capacity;
 } Flight;
 
-typedef struct Global_State {
-	int airports_count;
-	int flights_count;
-	Airport airports[MAX_AIRPORTS];
-	Flight flights[MAX_FLIGHTS];
-	Flight* sorted_flights_dep[MAX_FLIGHTS];
-	Flight* sorted_flights_arr[MAX_FLIGHTS];
-	Date date;
-} Global_State;
+/* Global Variables */
+extern int airports_count, flights_count;
+extern Airport airports[MAX_AIRPORTS];
+extern Flight flights[MAX_FLIGHTS];
+extern Flight* sorted_flights_dep[MAX_FLIGHTS];
+extern Flight* sorted_flights_arr[MAX_FLIGHTS];
+extern Date date;
 
 /* Function Prototypes */
-int commands(Global_State* global);
-int add_airport(Global_State* global);
-int add_flight(Global_State* global);
-int list_airports(Global_State* global);
-int list_flights(Global_State* global, char mode);
+int add_airport();
+int add_flight();
+int list_airports();
+int list_flights(char mode);
 int isvalid_flight_id(char* id);
-int get_flight(Global_State* global, char* id, Date date);
-int get_num_flights(Global_State* global, char* id);
-int get_airport(Global_State* global, char* id);
-int change_date(Global_State* global);
+int get_flight(char* id, Date date);
+int get_num_flights(char* id);
+int get_airport(char* id);
+int change_date();
 int compare_dates(Date date1, Date date2);
 int compare_time(Time time1, Time time2);
 int compare_date_and_time(Date date1, Date date2, Time time1, Time time2);
@@ -108,6 +105,5 @@ void print_date(Date date);
 void print_time(Time time);
 Time sum_time(Time time, Time duration);
 Date increment_date(Date date);
-int flight_error_handler(Global_State* global, char* flight_id,
-						 Date departure_date, char* arrival_id,
+int flight_error_handler(char* flight_id, Date departure_date, char* arrival_id,
 						 char* departure_id);

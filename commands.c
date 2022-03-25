@@ -14,8 +14,8 @@
  |  -A COMMAND
  -----------------------*/
 
-/* Adds an airport to the global state */
-int add_airport(Global_State* global) {
+/* Adds an airport to the  state */
+int add_airport() {
 	unsigned int i;
 	int n, ins_index;
 	char airport_id[AIRPORT_ID_LENGTH];
@@ -33,11 +33,11 @@ int add_airport(Global_State* global) {
 			return -1;
 		}
 	}
-	if (global->airports_count == MAX_AIRPORTS) {
+	if (airports_count == MAX_AIRPORTS) {
 		printf(TOO_MANY_AIPORTS);
 		return -1;
 	}
-	if ((ins_index = get_airport(global, airport_id)) >= 0) {
+	if ((ins_index = get_airport(airport_id)) >= 0) {
 		printf(DUPLICATE_AIRPORT);
 		return -1;
 	}
@@ -45,14 +45,14 @@ int add_airport(Global_State* global) {
 	init_airport(&airport, airport_id, country, city);
 
 	ins_index = -(ins_index + 1);
-	n = global->airports_count;
+	n = airports_count;
 	while (n > ins_index) {
-		global->airports[n] = global->airports[n - 1];
+		airports[n] = airports[n - 1];
 		n--;
 	}
 
-	global->airports[ins_index] = airport;
-	global->airports_count++;
+	airports[ins_index] = airport;
+	airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
 	return 0;
@@ -62,7 +62,7 @@ int add_airport(Global_State* global) {
  |  -L COMMAND
  -----------------------*/
 
-int list_airports(Global_State* global) {
+int list_airports() {
 	int i, num_flights;
 	char c;
 	char airportID[AIRPORT_ID_LENGTH];
@@ -70,21 +70,21 @@ int list_airports(Global_State* global) {
 
 	c = getchar();
 	if (c == '\n') {
-		for (i = 0; i < global->airports_count; i++) {
-			airport = global->airports[i];
-			num_flights = get_num_flights(global, airport.id);
+		for (i = 0; i < airports_count; i++) {
+			airport = airports[i];
+			num_flights = get_num_flights(airport.id);
 			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
 				   num_flights);
 		}
 	} else {
 		while (scanf("%s", airportID) != EOF) {
-			i = get_airport(global, airportID);
+			i = get_airport(airportID);
 			if (i < 0) {
 				printf(NO_SUCH_AIRPORT, airportID);
 				continue;
 			}
-			airport = global->airports[i];
-			num_flights = get_num_flights(global, airport.id);
+			airport = airports[i];
+			num_flights = get_num_flights(airport.id);
 			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
 				   num_flights);
 			if (getchar() == '\n') {
@@ -99,26 +99,26 @@ int list_airports(Global_State* global) {
  |  -V, P AND C COMMAND
  -----------------------*/
 
-int list_flights(Global_State* global, char mode) {
+int list_flights(char mode) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
 	Flight flight;
 
 	if (mode != 'n') {
 		scanf("%s", airport_id);
-		if (get_airport(global, airport_id) < 0) {
+		if (get_airport(airport_id) < 0) {
 			printf(NO_SUCH_AIRPORT, airport_id);
 			return -1;
 		}
 	}
 
-	for (i = 0; i < global->flights_count; i++) {
+	for (i = 0; i < flights_count; i++) {
 		if (mode == 'n') {
-			flight = global->flights[i];
+			flight = flights[i];
 		} else if (mode == 'c') {
-			flight = *global->sorted_flights_arr[i];
+			flight = *sorted_flights_arr[i];
 		} else {
-			flight = *global->sorted_flights_dep[i];
+			flight = *sorted_flights_dep[i];
 		}
 		if (mode == 'n' ||
 			(mode == 'c' && strcmp(flight.arrival.id, airport_id) == 0) ||
@@ -156,8 +156,8 @@ int list_flights(Global_State* global, char mode) {
  |  -V COMMAND
  -----------------------*/
 
-/* Adds a flight to the global state */
-int add_flight(Global_State* global) {
+/* Adds a flight to the  state */
+int add_flight() {
 	int i;
 	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
@@ -171,7 +171,7 @@ int add_flight(Global_State* global) {
 
 	c = getchar();
 	if (c == '\n') {
-		list_flights(global, 'n');
+		list_flights('n');
 		return 0;
 	}
 	scanf("%s", flight_id);
@@ -183,13 +183,13 @@ int add_flight(Global_State* global) {
 	read_time(&duration);
 	scanf("%d", &capacity);
 
-	if (flight_error_handler(global, flight_id, departure_date, arrival_id,
+	if (flight_error_handler(flight_id, departure_date, arrival_id,
 							 departure_id))
 		return -1;
 
-	future_date = global->date;
+	future_date = date;
 	future_date.year++;
-	if (compare_dates(departure_date, global->date) < 0 ||
+	if (compare_dates(departure_date, date) < 0 ||
 		compare_dates(departure_date, future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
@@ -203,8 +203,8 @@ int add_flight(Global_State* global) {
 		return -1;
 	}
 
-	arrival = global->airports[get_airport(global, arrival_id)];
-	departure = global->airports[get_airport(global, departure_id)];
+	arrival = airports[get_airport(arrival_id)];
+	departure = airports[get_airport(departure_id)];
 
 	init_flight(&flight, flight_id, departure, arrival, departure_date,
 				departure_time, duration, arrival_date, arrival_time, capacity);
@@ -220,31 +220,29 @@ int add_flight(Global_State* global) {
 	flight.arrival_date = arrival_date;
 	flight.arrival_time = arrival_time;
 
-	global->flights[global->flights_count] = flight;
-	global->flights_count++;
+	flights[flights_count] = flight;
+	flights_count++;
 
 	/* TODO improve insert sorted */
-	for (i = global->flights_count - 1;
+	for (i = flights_count - 1;
 		 i > 0 &&
 		 (compare_date_and_time(
-			  arrival_date, global->sorted_flights_arr[i - 1]->arrival_date,
-			  arrival_time,
-			  global->sorted_flights_arr[i - 1]->arrival_time) < 0);
+			  arrival_date, sorted_flights_arr[i - 1]->arrival_date,
+			  arrival_time, sorted_flights_arr[i - 1]->arrival_time) < 0);
 		 i--) {
-		global->sorted_flights_arr[i] = global->sorted_flights_arr[i - 1];
+		sorted_flights_arr[i] = sorted_flights_arr[i - 1];
 	}
-	global->sorted_flights_arr[i] = &global->flights[global->flights_count - 1];
+	sorted_flights_arr[i] = &flights[flights_count - 1];
 
-	for (i = global->flights_count - 1;
+	for (i = flights_count - 1;
 		 i > 0 &&
 		 (compare_date_and_time(
-			  departure_date, global->sorted_flights_dep[i - 1]->departure_date,
-			  departure_time,
-			  global->sorted_flights_dep[i - 1]->departure_time) < 0);
+			  departure_date, sorted_flights_dep[i - 1]->departure_date,
+			  departure_time, sorted_flights_dep[i - 1]->departure_time) < 0);
 		 i--) {
-		global->sorted_flights_dep[i] = global->sorted_flights_dep[i - 1];
+		sorted_flights_dep[i] = sorted_flights_dep[i - 1];
 	}
-	global->sorted_flights_dep[i] = &global->flights[global->flights_count - 1];
+	sorted_flights_dep[i] = &flights[flights_count - 1];
 
 	return 0;
 }
@@ -253,19 +251,19 @@ int add_flight(Global_State* global) {
  |  -T COMMAND
  -----------------------*/
 
-int change_date(Global_State* global) {
-	Date date;
+int change_date() {
+	Date new_date;
 	Date future_date;
 
-	read_date(&date);
-	future_date = global->date;
+	read_date(&new_date);
+	future_date = date;
 	future_date.year++;
-	if (compare_dates(date, global->date) < 0 ||
-		compare_dates(date, future_date) > 0) {
+	if (compare_dates(new_date, date) < 0 ||
+		compare_dates(new_date, future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
-	global->date = date;
+	date = new_date;
 
 	print_date(date);
 	putchar('\n');

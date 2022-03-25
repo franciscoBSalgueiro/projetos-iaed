@@ -11,13 +11,13 @@
 #include "proj1.h"
 
 /* returns index of airport or -index-1 if it doesn't exist */
-int get_airport(Global_State* global, char* id) {
+int get_airport(char* id) {
 	int f, l, m, cmp;
 	f = 0;
-	l = global->airports_count - 1;
+	l = airports_count - 1;
 	m = (f + l) / 2;
 	while (f <= l) {
-		cmp = strcmp(global->airports[m].id, id);
+		cmp = strcmp(airports[m].id, id);
 		if (cmp < 0)
 			f = m + 1;
 		else if (cmp == 0) {
@@ -30,22 +30,22 @@ int get_airport(Global_State* global, char* id) {
 }
 
 /* returns index of flight or -1 if it doesn't exist */
-int get_flight(Global_State* global, char* id, Date date) {
+int get_flight(char* id, Date date) {
 	int i;
-	for (i = 0; i < global->flights_count; i++) {
-		if (strcmp(global->flights[i].id, id) == 0 &&
-			compare_dates(global->flights->departure_date, date) == 0) {
+	for (i = 0; i < flights_count; i++) {
+		if (strcmp(flights[i].id, id) == 0 &&
+			compare_dates(flights->departure_date, date) == 0) {
 			return i;
 		}
 	}
 	return -1;
 }
 
-int get_num_flights(Global_State* global, char* id) {
+int get_num_flights(char* id) {
 	int i, count;
 	count = 0;
-	for (i = 0; i < global->flights_count; i++) {
-		if (strcmp(global->flights[i].departure.id, id) == 0) {
+	for (i = 0; i < flights_count; i++) {
+		if (strcmp(flights[i].departure.id, id) == 0) {
 			count++;
 		}
 	}
@@ -229,26 +229,25 @@ void print_time(Time time) { printf("%02d:%02d", time.hours, time.minutes); }
  |  ERROR FUNTIONS
  -----------------------*/
 
-int flight_error_handler(Global_State* global, char* flight_id,
-						 Date departure_date, char* arrival_id,
+int flight_error_handler(char* flight_id, Date departure_date, char* arrival_id,
 						 char* departure_id) {
 	if (!isvalid_flight_id(flight_id)) {
 		printf(INVALID_FLIGHT);
 		return 1;
 	}
-	if (get_flight(global, flight_id, departure_date) >= 0) {
+	if (get_flight(flight_id, departure_date) >= 0) {
 		printf(FLIGHT_ALREADY_EXISTS);
 		return 1;
 	}
-	if (get_airport(global, arrival_id) < 0) {
+	if (get_airport(arrival_id) < 0) {
 		printf(NO_SUCH_AIRPORT, arrival_id);
 		return 1;
 	}
-	if (get_airport(global, departure_id) < 0) {
+	if (get_airport(departure_id) < 0) {
 		printf(NO_SUCH_AIRPORT, departure_id);
 		return 1;
 	}
-	if (global->flights_count == MAX_FLIGHTS) {
+	if (flights_count == MAX_FLIGHTS) {
 		printf(TOO_MANY_FLIGHTS);
 		return 1;
 	}
