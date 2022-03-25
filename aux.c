@@ -4,6 +4,7 @@
  * Description: Auxiliary functions
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -52,17 +53,13 @@ int get_num_flights(Global_State* global, char* id) {
 }
 
 int check_flight_id(char* id) {
-	size_t i;
-	size_t length_id;
+	size_t i, length_id;
 	length_id = strlen(id);
-	if (length_id < 3 || length_id > 6) {
-		return 1;
-	}
-	if (id[0] < 'A' || id[0] > 'Z' || id[1] < 'A' || id[1] > 'Z') {
+	if (length_id < 3 || length_id > 6 || !isupper(id[0]) || !isupper(id[1])) {
 		return 1;
 	}
 	for (i = 2; i < length_id; i++) {
-		if (id[i] < '0' || id[i] > '9') {
+		if (!isdigit(id[i])) {
 			return 1;
 		}
 	}

@@ -1,9 +1,10 @@
 /*
  * File:  proj1.h
  * Author:  Francisco Salgueiro
- * Description: Constants and prototypes for proj1.c
+ * Description: Constants, structs and prototypes for proj1.c
  */
 
+/* CONSTANTS */
 #define MAX_FLIGHTS 30000
 #define MAX_AIRPORTS 40
 
@@ -14,6 +15,9 @@
 
 #define MIN_CAPACITY 10
 #define MAX_CAPACITY 100
+
+static const int DAYS_BY_MONTH[12] = {31, 28, 31, 30, 31, 30,
+									  31, 31, 30, 31, 30, 31};
 
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
@@ -33,12 +37,9 @@
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
-/* ARG FORMATS */
+/* ARGUMENT FORMATS */
 #define DATE_FORMAT "%d-%d-%d"
 #define TIME_FORMAT "%d:%d"
-
-static const int DAYS_BY_MONTH[12] = {31, 28, 31, 30, 31, 30,
-									  31, 31, 30, 31, 30, 31};
 
 /* STRUCTS */
 typedef struct Airport {

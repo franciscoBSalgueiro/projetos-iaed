@@ -1,7 +1,7 @@
 /*
  * File:  commands.c
  * Author:  Francisco Salgueiro
- * Description: Main project file
+ * Description: Functions for handling commands
  */
 
 #include <ctype.h>
@@ -17,7 +17,7 @@
 /* Adds an airport to the global state */
 int add_airport(Global_State* global) {
 	size_t i;
-	int ins_index;
+	int n, ins_index;
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
@@ -45,10 +45,12 @@ int add_airport(Global_State* global) {
 	init_airport(&airport, airport_id, country, city);
 
 	ins_index = -(ins_index + 1);
-	for (i = global->airports_count;
-		 i > 0 && strcmp(airport_id, global->airports[i - 1].id) < 0; i--) {
-		global->airports[i] = global->airports[i - 1];
+	n = global->airports_count;
+	while (n > ins_index) {
+		global->airports[n] = global->airports[n - 1];
+		n--;
 	}
+
 	global->airports[ins_index] = airport;
 	global->airports_count++;
 
@@ -151,7 +153,7 @@ int list_flights(Global_State* global, char mode) {
 }
 
 /*----------------------
- |  V COMMAND
+ |  -V COMMAND
  -----------------------*/
 
 /* Adds a flight to the global state */
@@ -269,7 +271,7 @@ int add_flight(Global_State* global) {
 }
 
 /*----------------------
- |  T COMMAND
+ |  -T COMMAND
  -----------------------*/
 
 int change_date(Global_State* global) {
