@@ -87,7 +87,7 @@ int add_airport(Global_State* global);
 int add_flight(Global_State* global);
 int list_airports(Global_State* global);
 int list_flights(Global_State* global, char mode);
-int check_flight_id(char* id);
+int isvalid_flight_id(char* id);
 int get_flight(Global_State* global, char* id, Date date);
 int get_num_flights(Global_State* global, char* id);
 int get_airport(Global_State* global, char* id);
@@ -108,3 +108,6 @@ void print_date(Date date);
 void print_time(Time time);
 Time sum_time(Time time, Time duration);
 Date increment_date(Date date);
+int flight_error_handler(Global_State* global, char* flight_id,
+						 Date departure_date, char* arrival_id,
+						 char* departure_id);

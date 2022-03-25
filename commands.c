@@ -16,7 +16,7 @@
 
 /* Adds an airport to the global state */
 int add_airport(Global_State* global) {
-	size_t i;
+	unsigned int i;
 	int n, ins_index;
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -163,12 +163,8 @@ int add_flight(Global_State* global) {
 	char departure_id[AIRPORT_ID_LENGTH];
 	char arrival_id[AIRPORT_ID_LENGTH];
 	Airport departure, arrival;
-	Date departure_date;
-	Date arrival_date;
-	Date future_date;
-	Time departure_time;
-	Time arrival_time;
-	Time duration;
+	Date departure_date, arrival_date, future_date;
+	Time departure_time, arrival_time, duration;
 	int capacity;
 	Flight flight;
 	char c;
@@ -187,26 +183,9 @@ int add_flight(Global_State* global) {
 	read_time(&duration);
 	scanf("%d", &capacity);
 
-	if (check_flight_id(flight_id)) {
-		printf(INVALID_FLIGHT);
+	if (flight_error_handler(global, flight_id, departure_date, arrival_id,
+							 departure_id))
 		return -1;
-	}
-	if (get_flight(global, flight_id, departure_date) >= 0) {
-		printf(FLIGHT_ALREADY_EXISTS);
-		return -1;
-	}
-	if (get_airport(global, arrival_id) < 0) {
-		printf(NO_SUCH_AIRPORT, arrival_id);
-		return -1;
-	}
-	if (get_airport(global, departure_id) < 0) {
-		printf(NO_SUCH_AIRPORT, departure_id);
-		return -1;
-	}
-	if (global->flights_count == MAX_FLIGHTS) {
-		printf(TOO_MANY_FLIGHTS);
-		return -1;
-	}
 
 	future_date = global->date;
 	future_date.year++;

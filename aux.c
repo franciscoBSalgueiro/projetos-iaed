@@ -10,7 +10,7 @@
 
 #include "proj1.h"
 
-/* returns index of airport or negative index-1 if it doesn't exist */
+/* returns index of airport or -index-1 if it doesn't exist */
 int get_airport(Global_State* global, char* id) {
 	int f, l, m, cmp;
 	f = 0;
@@ -52,18 +52,19 @@ int get_num_flights(Global_State* global, char* id) {
 	return count;
 }
 
-int check_flight_id(char* id) {
-	size_t i, length_id;
+/* Returns 1 if the flightID is valid, otherwise returns 0 */
+int isvalid_flight_id(char* id) {
+	unsigned int i, length_id;
 	length_id = strlen(id);
 	if (length_id < 3 || length_id > 6 || !isupper(id[0]) || !isupper(id[1])) {
-		return 1;
+		return 0;
 	}
 	for (i = 2; i < length_id; i++) {
 		if (!isdigit(id[i])) {
-			return 1;
+			return 0;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 /*----------------------
@@ -145,6 +146,7 @@ int compare_time(Time time1, Time time2) {
 	return 0;
 }
 
+/* Combines the two previous funcitons */
 int compare_date_and_time(Date date1, Date date2, Time time1, Time time2) {
 	int d, t;
 	if ((d = compare_dates(date1, date2)) < 0) {
@@ -222,3 +224,33 @@ void print_date(Date date) {
 
 /* Prints time in formatted form */
 void print_time(Time time) { printf("%02d:%02d", time.hours, time.minutes); }
+
+/*----------------------
+ |  ERROR FUNTIONS
+ -----------------------*/
+
+int flight_error_handler(Global_State* global, char* flight_id,
+						 Date departure_date, char* arrival_id,
+						 char* departure_id) {
+	if (!isvalid_flight_id(flight_id)) {
+		printf(INVALID_FLIGHT);
+		return 1;
+	}
+	if (get_flight(global, flight_id, departure_date) >= 0) {
+		printf(FLIGHT_ALREADY_EXISTS);
+		return 1;
+	}
+	if (get_airport(global, arrival_id) < 0) {
+		printf(NO_SUCH_AIRPORT, arrival_id);
+		return 1;
+	}
+	if (get_airport(global, departure_id) < 0) {
+		printf(NO_SUCH_AIRPORT, departure_id);
+		return 1;
+	}
+	if (global->flights_count == MAX_FLIGHTS) {
+		printf(TOO_MANY_FLIGHTS);
+		return 1;
+	}
+	return 0;
+}
