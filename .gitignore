@@ -1,4 +1,4 @@
-/*.exe
-/*.out
+*.exe
+*.out
 /tests/*.result
 *.zip
