@@ -143,14 +143,14 @@ int list_flights(char mode) {
 					break;
 			}
 			if (mode == 'c') {
-				print_date(flight.arrival_date);
+				print_date(&flight.arrival_date);
 				putchar(' ');
-				print_time(flight.arrival_time);
+				print_time(&flight.arrival_time);
 				putchar('\n');
 			} else {
-				print_date(flight.departure_date);
+				print_date(&flight.departure_date);
 				putchar(' ');
-				print_time(flight.departure_time);
+				print_time(&flight.departure_time);
 				putchar('\n');
 			}
 		}
@@ -189,22 +189,23 @@ int add_flight() {
 	read_time(&duration);
 	scanf("%d", &capacity);
 
-	if (flight_error_handler(flight_id, departure_date, arrival_id,
+	if (flight_error_handler(flight_id, &departure_date, arrival_id,
 							 departure_id))
 		return -1;
 
 	future_date = date;
 	future_date.year++;
-	if (compare_dates(departure_date, date) < 0 ||
-		compare_dates(departure_date, future_date) > 0) {
+	if (compare_dates(&departure_date, &date) < 0 ||
+		compare_dates(&departure_date, &future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
+
 	if (duration.hours > 12 || (duration.hours == 12 && duration.minutes > 0)) {
 		printf(INVALID_DURATION);
 		return -1;
 	}
-	if (capacity < 10 || capacity > 100) {
+	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY) {
 		printf(INVALID_CAPACITY);
 		return -1;
 	}
@@ -215,7 +216,7 @@ int add_flight() {
 	init_flight(&flight, flight_id, departure, arrival, departure_date,
 				departure_time, duration, arrival_date, arrival_time, capacity);
 
-	arrival_time = sum_time(departure_time, duration);
+	arrival_time = sum_time(&departure_time, &duration);
 	if (arrival_time.hours >= 24) {
 		arrival_time.hours -= 24;
 		arrival_date = increment_date(departure_date);
@@ -244,14 +245,14 @@ int change_date() {
 	read_date(&new_date);
 	future_date = date;
 	future_date.year++;
-	if (compare_dates(new_date, date) < 0 ||
-		compare_dates(new_date, future_date) > 0) {
+	if (compare_dates(&new_date, &date) < 0 ||
+		compare_dates(&new_date, &future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
 	date = new_date;
 
-	print_date(date);
+	print_date(&date);
 	putchar('\n');
 
 	return 0;

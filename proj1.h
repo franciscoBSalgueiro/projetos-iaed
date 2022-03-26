@@ -88,13 +88,13 @@ int add_flight();
 int list_airports();
 int list_flights(char mode);
 int isvalid_flight_id(char* id);
-int get_flight(char* id, Date date);
+int get_flight(char id[], Date* date);
 int get_num_flights(char* id);
-int get_airport(char* id);
+int get_airport(char id[]);
 int change_date();
-int compare_dates(Date date1, Date date2);
-int compare_time(Time time1, Time time2);
-int compare_date_and_time(Date date1, Date date2, Time time1, Time time2);
+int compare_dates(Date* date1, Date* date2);
+int compare_time(Time* time1, Time* time2);
+int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
@@ -104,11 +104,11 @@ void init_airport(Airport* airport, char* id, char* country, char* city);
 void read_date(Date* date);
 void read_time(Time* time);
 void read_airport(Airport* airport);
-void print_date(Date date);
-void print_time(Time time);
+void print_date(Date* date);
+void print_time(Time* time);
 void sort_arrivals();
 void sort_departures();
-Time sum_time(Time time, Time duration);
+Time sum_time(Time* time, Time* duration);
 Date increment_date(Date date);
-int flight_error_handler(char* flight_id, Date departure_date, char* arrival_id,
+int flight_error_handler(char* flight_id, Date* departure_date, char* arrival_id,
 						 char* departure_id);
