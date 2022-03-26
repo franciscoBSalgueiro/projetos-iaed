@@ -201,14 +201,14 @@ Time sum_time(Time time1, Time time2) {
 void read_date(Date* date) {
 	int year, month, day;
 
-	scanf(DATE_FORMAT, &day, &month, &year);
+	scanf(IN_DATE_FORMAT, &day, &month, &year);
 	init_date(date, day, month, year);
 }
 
 void read_time(Time* time) {
 	int minutes, hours;
 
-	scanf(TIME_FORMAT, &minutes, &hours);
+	scanf(IN_TIME_FORMAT, &minutes, &hours);
 	init_time(time, minutes, hours);
 }
 
@@ -218,11 +218,11 @@ void read_time(Time* time) {
 
 /* Prints date in formatted form */
 void print_date(Date date) {
-	printf("%02d-%02d-%04d", date.day, date.month, date.year);
+	printf(OUT_DATE_FORMAT, date.day, date.month, date.year);
 }
 
 /* Prints time in formatted form */
-void print_time(Time time) { printf("%02d:%02d", time.hours, time.minutes); }
+void print_time(Time time) { printf(OUT_TIME_FORMAT, time.hours, time.minutes); }
 
 /*----------------------
  |  ERROR FUNTIONS

@@ -38,8 +38,10 @@ static const int DAYS_BY_MONTH[12] = {31, 28, 31, 30, 31, 30,
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
 /* ARGUMENT FORMATS */
-#define DATE_FORMAT "%d-%d-%d"
-#define TIME_FORMAT "%d:%d"
+#define IN_DATE_FORMAT "%d-%d-%d"
+#define OUT_DATE_FORMAT "%02d-%02d-%d"
+#define IN_TIME_FORMAT "%d:%d"
+#define OUT_TIME_FORMAT "%02d:%02d"
 
 /* STRUCTS */
 typedef struct Airport {
