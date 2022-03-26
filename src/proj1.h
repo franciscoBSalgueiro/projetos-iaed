@@ -80,6 +80,7 @@ extern Airport* sorted_airports[MAX_AIRPORTS];
 extern Flight flights[MAX_FLIGHTS];
 extern Flight* sorted_flights_dep[MAX_FLIGHTS];
 extern Flight* sorted_flights_arr[MAX_FLIGHTS];
+extern int departures_sorted, arrival_sorted;
 extern Date date;
 
 /* Function Prototypes */

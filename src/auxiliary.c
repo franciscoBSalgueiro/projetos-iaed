@@ -240,12 +240,12 @@ int flight_error_handler(char* flight_id, Date* departure_date,
 		printf(FLIGHT_ALREADY_EXISTS);
 		return 1;
 	}
-	if (get_airport(arrival_id) < 0) {
-		printf(NO_SUCH_AIRPORT, arrival_id);
-		return 1;
-	}
 	if (get_airport(departure_id) < 0) {
 		printf(NO_SUCH_AIRPORT, departure_id);
+		return 1;
+	}
+	if (get_airport(arrival_id) < 0) {
+		printf(NO_SUCH_AIRPORT, arrival_id);
 		return 1;
 	}
 	if (flights_count == MAX_FLIGHTS) {

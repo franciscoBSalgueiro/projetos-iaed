@@ -112,9 +112,15 @@ int list_flights(char mode) {
 			return -1;
 		}
 		if (mode == 'c') {
-			sort_arrivals();
+			if (!arrival_sorted) {
+				arrival_sorted = 1;
+				sort_arrivals();
+			}
 		} else {
+			if (!departures_sorted) {
+				departures_sorted = 1;
 			sort_departures();
+			}
 		}
 	}
 
@@ -233,6 +239,8 @@ int add_flight() {
 	sorted_flights_arr[flights_count] = &flights[flights_count];
 	sorted_flights_dep[flights_count] = &flights[flights_count];
 	flights_count++;
+	departures_sorted = 0;
+	arrival_sorted = 0;
 	return 0;
 }
 

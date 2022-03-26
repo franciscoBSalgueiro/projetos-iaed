@@ -16,6 +16,8 @@ Airport* sorted_airports[MAX_AIRPORTS];
 Flight flights[MAX_FLIGHTS];
 Flight* sorted_flights_dep[MAX_FLIGHTS];
 Flight* sorted_flights_arr[MAX_FLIGHTS];
+int departures_sorted = 0;
+int arrival_sorted = 0;
 Date date = {1, 1, 2022};
 
 int main() {
