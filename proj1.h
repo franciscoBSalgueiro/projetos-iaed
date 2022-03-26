@@ -61,8 +61,8 @@ typedef struct Time {
 
 typedef struct Flight {
 	char id[FLIGHT_ID_LENGTH];
-	Airport departure;
-	Airport arrival;
+	Airport* departure;
+	Airport* arrival;
 	Date departure_date;
 	Time departure_time;
 	Time duration;
@@ -74,6 +74,7 @@ typedef struct Flight {
 /* Global Variables */
 extern int airports_count, flights_count;
 extern Airport airports[MAX_AIRPORTS];
+extern Airport* sorted_airports[MAX_AIRPORTS];
 extern Flight flights[MAX_FLIGHTS];
 extern Flight* sorted_flights_dep[MAX_FLIGHTS];
 extern Flight* sorted_flights_arr[MAX_FLIGHTS];
@@ -94,7 +95,7 @@ int compare_time(Time time1, Time time2);
 int compare_date_and_time(Date date1, Date date2, Time time1, Time time2);
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
-void init_flight(Flight* flight, char* id, Airport departure, Airport arrival,
+void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date departure_date, Time departure_time, Time duration,
 				 Date arrival_date, Time arrival_time, int capacity);
 void init_airport(Airport* airport, char* id, char* country, char* city);
@@ -103,6 +104,8 @@ void read_time(Time* time);
 void read_airport(Airport* airport);
 void print_date(Date date);
 void print_time(Time time);
+void sort_arrivals();
+void sort_departures();
 Time sum_time(Time time, Time duration);
 Date increment_date(Date date);
 int flight_error_handler(char* flight_id, Date departure_date, char* arrival_id,

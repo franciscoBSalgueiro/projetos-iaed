@@ -17,7 +17,7 @@ int get_airport(char* id) {
 	l = airports_count - 1;
 	m = (f + l) / 2;
 	while (f <= l) {
-		cmp = strcmp(airports[m].id, id);
+		cmp = strcmp(sorted_airports[m]->id, id);
 		if (cmp < 0)
 			f = m + 1;
 		else if (cmp == 0) {
@@ -29,7 +29,6 @@ int get_airport(char* id) {
 	return -f - 1;
 }
 
-/* returns index of flight or -1 if it doesn't exist */
 int get_flight(char* id, Date date) {
 	int i;
 	for (i = 0; i < flights_count; i++) {
@@ -45,7 +44,7 @@ int get_num_flights(char* id) {
 	int i, count;
 	count = 0;
 	for (i = 0; i < flights_count; i++) {
-		if (strcmp(flights[i].departure.id, id) == 0) {
+		if (strcmp(flights[i].departure->id, id) == 0) {
 			count++;
 		}
 	}
@@ -54,12 +53,12 @@ int get_num_flights(char* id) {
 
 /* Returns 1 if the flightID is valid, otherwise returns 0 */
 int isvalid_flight_id(char* id) {
-	unsigned int i, length_id;
-	length_id = strlen(id);
-	if (length_id < 3 || length_id > 6 || !isupper(id[0]) || !isupper(id[1])) {
+	unsigned int i, l;
+	l = strlen(id);
+	if (l < 3 || l > 6 || !isupper(id[0]) || !isupper(id[1])) {
 		return 0;
 	}
-	for (i = 2; i < length_id; i++) {
+	for (i = 2; i < l; i++) {
 		if (!isdigit(id[i])) {
 			return 0;
 		}
@@ -80,7 +79,7 @@ void init_date(Date* date, int day, int month, int year) {
 	date->month = month;
 	date->year = year;
 }
-void init_flight(Flight* flight, char* id, Airport departure, Airport arrival,
+void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date departure_date, Time departure_time, Time duration,
 				 Date arrival_date, Time arrival_time, int capacity) {
 	strcpy(flight->id, id);
@@ -252,4 +251,39 @@ int flight_error_handler(char* flight_id, Date departure_date, char* arrival_id,
 		return 1;
 	}
 	return 0;
+}
+
+void sort_arrivals() {
+	int i, j;
+	Flight* temp;
+
+	for (i = 1; i < flights_count; i++) {
+		temp = sorted_flights_arr[i];
+		for (j = i - 1;
+			 j >= 0 &&
+			 compare_date_and_time(
+				 sorted_flights_arr[j]->arrival_date, temp->arrival_date,
+				 sorted_flights_arr[j]->arrival_time, temp->arrival_time) > 0;
+			 j--) {
+			sorted_flights_arr[j + 1] = sorted_flights_arr[j];
+		}
+		sorted_flights_arr[j + 1] = temp;
+	}
+}
+void sort_departures() {
+	int i, j;
+	Flight* temp;
+
+	for (i = 1; i < flights_count; i++) {
+		temp = sorted_flights_dep[i];
+		for (j = i - 1; j >= 0 && compare_date_and_time(
+									  sorted_flights_dep[j]->departure_date,
+									  temp->departure_date,
+									  sorted_flights_dep[j]->departure_time,
+									  temp->departure_time) > 0;
+			 j--) {
+			sorted_flights_dep[j + 1] = sorted_flights_dep[j];
+		}
+		sorted_flights_dep[j + 1] = temp;
+	}
 }

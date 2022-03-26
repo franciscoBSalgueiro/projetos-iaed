@@ -12,6 +12,7 @@
 int airports_count = 0;
 int flights_count = 0;
 Airport airports[MAX_AIRPORTS];
+Airport* sorted_airports[MAX_AIRPORTS];
 Flight flights[MAX_FLIGHTS];
 Flight* sorted_flights_dep[MAX_FLIGHTS];
 Flight* sorted_flights_arr[MAX_FLIGHTS];

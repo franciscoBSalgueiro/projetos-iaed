@@ -16,7 +16,7 @@
 
 /* Adds an airport to the  state */
 int add_airport() {
-	unsigned int i;
+	unsigned int i, l;
 	int n, ins_index;
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -27,7 +27,8 @@ int add_airport() {
 	scanf("%s", country);
 	scanf(" %[^\n]", city); /* includes everything until end of line */
 
-	for (i = 0; i < strlen(airport_id); i++) {
+	l = strlen(airport_id);
+	for (i = 0; i < l; i++) {
 		if (!isupper((airport_id[i]))) {
 			printf(INVALID_AIRPORT_ID);
 			return -1;
@@ -43,15 +44,15 @@ int add_airport() {
 	}
 
 	init_airport(&airport, airport_id, country, city);
+	airports[airports_count] = airport;
 
 	ins_index = -(ins_index + 1);
 	n = airports_count;
 	while (n > ins_index) {
-		airports[n] = airports[n - 1];
+		sorted_airports[n] = sorted_airports[n - 1];
 		n--;
 	}
-
-	airports[ins_index] = airport;
+	sorted_airports[ins_index] = &airports[airports_count];
 	airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
@@ -66,14 +67,14 @@ int list_airports() {
 	int i, num_flights;
 	char c;
 	char airportID[AIRPORT_ID_LENGTH];
-	Airport airport;
+	Airport* airport;
 
 	c = getchar();
 	if (c == '\n') {
 		for (i = 0; i < airports_count; i++) {
-			airport = airports[i];
-			num_flights = get_num_flights(airport.id);
-			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
+			airport = sorted_airports[i];
+			num_flights = get_num_flights(airport->id);
+			printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
 				   num_flights);
 		}
 	} else {
@@ -83,9 +84,9 @@ int list_airports() {
 				printf(NO_SUCH_AIRPORT, airportID);
 				continue;
 			}
-			airport = airports[i];
-			num_flights = get_num_flights(airport.id);
-			printf(AIRPORT_STRING, airport.id, airport.city, airport.country,
+			airport = sorted_airports[i];
+			num_flights = get_num_flights(airport->id);
+			printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
 				   num_flights);
 			if (getchar() == '\n') {
 				break;
@@ -110,6 +111,11 @@ int list_flights(char mode) {
 			printf(NO_SUCH_AIRPORT, airport_id);
 			return -1;
 		}
+		if (mode == 'c') {
+			sort_arrivals();
+		} else {
+			sort_departures();
+		}
 	}
 
 	for (i = 0; i < flights_count; i++) {
@@ -121,19 +127,19 @@ int list_flights(char mode) {
 			flight = *sorted_flights_dep[i];
 		}
 		if (mode == 'n' ||
-			(mode == 'c' && strcmp(flight.arrival.id, airport_id) == 0) ||
-			(mode == 'p' && strcmp(flight.departure.id, airport_id) == 0)) {
+			(mode == 'c' && strcmp(flight.arrival->id, airport_id) == 0) ||
+			(mode == 'p' && strcmp(flight.departure->id, airport_id) == 0)) {
 			switch (mode) {
 				case 'c':
 					printf(FLIGHT_STRING_REDUCED, flight.id,
-						   flight.departure.id);
+						   flight.departure->id);
 					break;
 				case 'p':
-					printf(FLIGHT_STRING_REDUCED, flight.id, flight.arrival.id);
+					printf(FLIGHT_STRING_REDUCED, flight.id, flight.arrival->id);
 					break;
 				default:
-					printf(FLIGHT_STRING, flight.id, flight.departure.id,
-						   flight.arrival.id);
+					printf(FLIGHT_STRING, flight.id, flight.departure->id,
+						   flight.arrival->id);
 					break;
 			}
 			if (mode == 'c') {
@@ -158,11 +164,11 @@ int list_flights(char mode) {
 
 /* Adds a flight to the  state */
 int add_flight() {
-	int i;
 	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
 	char arrival_id[AIRPORT_ID_LENGTH];
-	Airport departure, arrival;
+	Airport* departure;
+	Airport* arrival;
 	Date departure_date, arrival_date, future_date;
 	Time departure_time, arrival_time, duration;
 	int capacity;
@@ -203,8 +209,8 @@ int add_flight() {
 		return -1;
 	}
 
-	arrival = airports[get_airport(arrival_id)];
-	departure = airports[get_airport(departure_id)];
+	arrival = sorted_airports[get_airport(arrival_id)];
+	departure = sorted_airports[get_airport(departure_id)];
 
 	init_flight(&flight, flight_id, departure, arrival, departure_date,
 				departure_time, duration, arrival_date, arrival_time, capacity);
@@ -221,29 +227,9 @@ int add_flight() {
 	flight.arrival_time = arrival_time;
 
 	flights[flights_count] = flight;
+	sorted_flights_arr[flights_count] = &flights[flights_count];
+	sorted_flights_dep[flights_count] = &flights[flights_count];
 	flights_count++;
-
-	/* TODO improve insert sorted */
-	for (i = flights_count - 1;
-		 i > 0 &&
-		 (compare_date_and_time(
-			  arrival_date, sorted_flights_arr[i - 1]->arrival_date,
-			  arrival_time, sorted_flights_arr[i - 1]->arrival_time) < 0);
-		 i--) {
-		sorted_flights_arr[i] = sorted_flights_arr[i - 1];
-	}
-	sorted_flights_arr[i] = &flights[flights_count - 1];
-
-	for (i = flights_count - 1;
-		 i > 0 &&
-		 (compare_date_and_time(
-			  departure_date, sorted_flights_dep[i - 1]->departure_date,
-			  departure_time, sorted_flights_dep[i - 1]->departure_time) < 0);
-		 i--) {
-		sorted_flights_dep[i] = sorted_flights_dep[i - 1];
-	}
-	sorted_flights_dep[i] = &flights[flights_count - 1];
-
 	return 0;
 }
 
