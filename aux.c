@@ -80,16 +80,16 @@ void init_date(Date* date, int day, int month, int year) {
 	date->year = year;
 }
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
-				 Date departure_date, Time departure_time, Time duration,
-				 Date arrival_date, Time arrival_time, int capacity) {
+				 Date* departure_date, Time* departure_time, Time* duration,
+				 Date* arrival_date, Time* arrival_time, int capacity) {
 	strcpy(flight->id, id);
 	flight->departure = departure;
 	flight->arrival = arrival;
-	flight->departure_date = departure_date;
-	flight->arrival_date = arrival_date;
-	flight->departure_time = departure_time;
-	flight->arrival_time = arrival_time;
-	flight->duration = duration;
+	flight->departure_date = *departure_date;
+	flight->arrival_date = *arrival_date;
+	flight->departure_time = *departure_time;
+	flight->arrival_time = *arrival_time;
+	flight->duration = *duration;
 	flight->capacity = capacity;
 }
 

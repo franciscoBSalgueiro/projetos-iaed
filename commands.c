@@ -135,7 +135,8 @@ int list_flights(char mode) {
 						   flight.departure->id);
 					break;
 				case 'p':
-					printf(FLIGHT_STRING_REDUCED, flight.id, flight.arrival->id);
+					printf(FLIGHT_STRING_REDUCED, flight.id,
+						   flight.arrival->id);
 					break;
 				default:
 					printf(FLIGHT_STRING, flight.id, flight.departure->id,
@@ -213,8 +214,9 @@ int add_flight() {
 	arrival = sorted_airports[get_airport(arrival_id)];
 	departure = sorted_airports[get_airport(departure_id)];
 
-	init_flight(&flight, flight_id, departure, arrival, departure_date,
-				departure_time, duration, arrival_date, arrival_time, capacity);
+	init_flight(&flight, flight_id, departure, arrival, &departure_date,
+				&departure_time, &duration, &arrival_date, &arrival_time,
+				capacity);
 
 	arrival_time = sum_time(&departure_time, &duration);
 	if (arrival_time.hours >= 24) {
