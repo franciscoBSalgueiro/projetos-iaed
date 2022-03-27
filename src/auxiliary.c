@@ -12,21 +12,21 @@
 
 /* returns index of airport or -index-1 if it doesn't exist */
 int get_airport(char id[]) {
-	int f, l, m, cmp;
-	f = 0;
-	l = airports_count - 1;
-	m = (f + l) / 2;
-	while (f <= l) {
-		cmp = strcmp(sorted_airports[m]->id, id);
+	int left, right, middle, cmp;
+	left = 0;
+	right = airports_count - 1;
+	middle = (left + right) / 2;
+	while (left <= right) {
+		cmp = strcmp(sorted_airports[middle]->id, id);
 		if (cmp < 0)
-			f = m + 1;
+			left = middle + 1;
 		else if (cmp == 0) {
-			return m;
+			return middle;
 		} else
-			l = m - 1;
-		m = (f + l) / 2;
+			right = middle - 1;
+		middle = (left + right) / 2;
 	}
-	return -f - 1;
+	return -left - 1;
 }
 
 int get_flight(char id[], Date* date) {
@@ -151,14 +151,16 @@ int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	if ((d = compare_dates(date1, date2)) < 0) {
 		return -1;
 	}
-	if (d == 0) {
-		if ((t = compare_time(time1, time2)) < 0) {
-			return -1;
-		} else if (t == 0) {
-			return 0;
-		}
+	if (d > 0) {
+		return 1;
 	}
-	return 1;
+	if ((t = compare_time(time1, time2)) < 0) {
+		return -1;
+	}
+	if (t > 0) {
+		return 1;
+	}
+	return 0;
 }
 
 /*----------------------
@@ -171,10 +173,10 @@ Date increment_date(Date date) {
 	result.day = date.day + 1;
 	result.month = date.month;
 	result.year = date.year;
-	if (result.day > DAYS_BY_MONTH[result.month - 1]) {
+	if (result.day > MONTH_DAYS[result.month - 1]) {
 		result.month++;
 		result.day = 1;
-		if (result.month > 12) {
+		if (result.month > NUM_MONTHS) {
 			result.year++;
 			result.month = 1;
 		}
@@ -187,9 +189,9 @@ Time sum_time(Time* time1, Time* time2) {
 	Time result;
 	result.hours = time1->hours + time2->hours;
 	result.minutes = time1->minutes + time2->minutes;
-	if (result.minutes >= 60) {
+	if (result.minutes >= NUM_MINUTES) {
 		result.hours++;
-		result.minutes -= 60;
+		result.minutes -= NUM_MINUTES;
 	}
 	return result;
 }

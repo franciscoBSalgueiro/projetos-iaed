@@ -15,9 +15,14 @@
 
 #define MIN_CAPACITY 10
 #define MAX_CAPACITY 100
+#define MAX_DURATION 12
 
-static const int DAYS_BY_MONTH[12] = {31, 28, 31, 30, 31, 30,
-									  31, 31, 30, 31, 30, 31};
+#define NUM_MINUTES 60
+#define NUM_HOURS 24
+#define NUM_MONTHS 12
+
+static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
+										   31, 31, 30, 31, 30, 31};
 
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
@@ -80,7 +85,7 @@ extern Airport* sorted_airports[MAX_AIRPORTS];
 extern Flight flights[MAX_FLIGHTS];
 extern Flight* sorted_flights_dep[MAX_FLIGHTS];
 extern Flight* sorted_flights_arr[MAX_FLIGHTS];
-extern int departures_sorted, arrival_sorted;
+extern int is_departures_sorted, is_arrivals_sorted;
 extern Date date;
 
 /* Function Prototypes */

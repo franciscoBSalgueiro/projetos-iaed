@@ -64,33 +64,30 @@ int add_airport() {
  -----------------------*/
 
 int list_airports() {
-	int i, num_flights;
-	char c;
+	int i, num_flights, has_argument;
 	char airportID[AIRPORT_ID_LENGTH];
 	Airport* airport;
 
-	c = getchar();
-	if (c == '\n') {
+	has_argument = 0;
+	while (getchar() != '\n') {
+		has_argument = 1;
+		scanf("%s", airportID);
+		i = get_airport(airportID);
+		if (i < 0) {
+			printf(NO_SUCH_AIRPORT, airportID);
+			continue;
+		}
+		airport = sorted_airports[i];
+		num_flights = get_num_flights(airport->id);
+		printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
+			   num_flights);
+	}
+	if (!has_argument) {
 		for (i = 0; i < airports_count; i++) {
 			airport = sorted_airports[i];
 			num_flights = get_num_flights(airport->id);
 			printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
 				   num_flights);
-		}
-	} else {
-		while (scanf("%s", airportID) != EOF) {
-			i = get_airport(airportID);
-			if (i < 0) {
-				printf(NO_SUCH_AIRPORT, airportID);
-				continue;
-			}
-			airport = sorted_airports[i];
-			num_flights = get_num_flights(airport->id);
-			printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
-				   num_flights);
-			if (getchar() == '\n') {
-				break;
-			}
 		}
 	}
 	return 0;
@@ -112,14 +109,14 @@ int list_flights(char mode) {
 			return -1;
 		}
 		if (mode == 'c') {
-			if (!arrival_sorted) {
-				arrival_sorted = 1;
+			if (!is_arrivals_sorted) {
+				is_arrivals_sorted = 1;
 				sort_arrivals();
 			}
 		} else {
-			if (!departures_sorted) {
-				departures_sorted = 1;
-			sort_departures();
+			if (!is_departures_sorted) {
+				is_departures_sorted = 1;
+				sort_departures();
 			}
 		}
 	}
@@ -208,7 +205,8 @@ int add_flight() {
 		return -1;
 	}
 
-	if (duration.hours > 12 || (duration.hours == 12 && duration.minutes > 0)) {
+	if (duration.hours > MAX_DURATION ||
+		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
 		printf(INVALID_DURATION);
 		return -1;
 	}
@@ -225,8 +223,8 @@ int add_flight() {
 				capacity);
 
 	arrival_time = sum_time(&departure_time, &duration);
-	if (arrival_time.hours >= 24) {
-		arrival_time.hours -= 24;
+	if (arrival_time.hours >= NUM_HOURS) {
+		arrival_time.hours -= NUM_HOURS;
 		arrival_date = increment_date(departure_date);
 	} else {
 		arrival_date = departure_date;
@@ -239,8 +237,8 @@ int add_flight() {
 	sorted_flights_arr[flights_count] = &flights[flights_count];
 	sorted_flights_dep[flights_count] = &flights[flights_count];
 	flights_count++;
-	departures_sorted = 0;
-	arrival_sorted = 0;
+	is_departures_sorted = 0;
+	is_arrivals_sorted = 0;
 	return 0;
 }
 
