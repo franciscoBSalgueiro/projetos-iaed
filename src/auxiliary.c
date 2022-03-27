@@ -33,7 +33,7 @@ int get_flight(char id[], Date* date) {
 	int i;
 	for (i = 0; i < flights_count; i++) {
 		if (strcmp(flights[i].id, id) == 0 &&
-			compare_dates(&flights->departure_date, date) == 0) {
+			compare_date(&flights->departure_date, date) == 0) {
 			return i;
 		}
 	}
@@ -41,8 +41,7 @@ int get_flight(char id[], Date* date) {
 }
 
 int get_num_flights(char* id) {
-	int i, count;
-	count = 0;
+	int i, count = 0;
 	for (i = 0; i < flights_count; i++) {
 		if (strcmp(flights[i].departure->id, id) == 0) {
 			count++;
@@ -66,9 +65,9 @@ int isvalid_flight_id(char* id) {
 	return 1;
 }
 
-/*----------------------
- |  INTIALIAZING FUNTIONS
- -----------------------*/
+/*--------------------------
+ |  INTIALIAZING FUNTIONS	|
+ ---------------------------*/
 
 void init_time(Time* time, int hours, int minutes) {
 	time->hours = hours;
@@ -79,6 +78,13 @@ void init_date(Date* date, int day, int month, int year) {
 	date->month = month;
 	date->year = year;
 }
+
+void init_airport(Airport* airport, char* id, char* country, char* city) {
+	strcpy(airport->id, id);
+	strcpy(airport->country, country);
+	strcpy(airport->city, city);
+}
+
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
 				 Date* arrival_date, Time* arrival_time, int capacity) {
@@ -93,19 +99,13 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 	flight->capacity = capacity;
 }
 
-void init_airport(Airport* airport, char* id, char* country, char* city) {
-	strcpy(airport->id, id);
-	strcpy(airport->country, country);
-	strcpy(airport->city, city);
-}
-
 /*----------------------
- |  COMPARISON FUNTIONS
+ |  COMPARISON FUNTIONS	|
  -----------------------*/
 
 /* Returns -1 if date1 happens before date2, 0 if the dates are equal and 1 if
  * date1 happens after date2 */
-int compare_dates(Date* date1, Date* date2) {
+int compare_date(Date* date1, Date* date2) {
 	if (date1->year < date2->year) {
 		return -1;
 	}
@@ -148,7 +148,7 @@ int compare_time(Time* time1, Time* time2) {
 /* Combines the two previous funcitons */
 int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	int d, t;
-	if ((d = compare_dates(date1, date2)) < 0) {
+	if ((d = compare_date(date1, date2)) < 0) {
 		return -1;
 	}
 	if (d > 0) {
@@ -163,60 +163,93 @@ int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	return 0;
 }
 
-/*----------------------
- |  DATE AND TIME FUNTIONS
- -----------------------*/
+/*--------------------------
+ |   DATE & TIME FUNTIONS	|
+ ---------------------------*/
 
 /* Adds one day to date */
 Date increment_date(Date date) {
-	Date result;
-	result.day = date.day + 1;
-	result.month = date.month;
-	result.year = date.year;
-	if (result.day > MONTH_DAYS[result.month - 1]) {
-		result.month++;
-		result.day = 1;
-		if (result.month > NUM_MONTHS) {
-			result.year++;
-			result.month = 1;
+	date.day++;
+	if (date.day > MONTH_DAYS[date.month - 1]) {
+		date.day = 1;
+		date.month++;
+		if (date.month > 12) {
+			date.month = 1;
+			date.year++;
 		}
 	}
-	return result;
+	return date;
 }
 
 /* Sums two times */
 Time sum_time(Time* time1, Time* time2) {
-	Time result;
-	result.hours = time1->hours + time2->hours;
-	result.minutes = time1->minutes + time2->minutes;
-	if (result.minutes >= NUM_MINUTES) {
-		result.hours++;
-		result.minutes -= NUM_MINUTES;
+	Time sum;
+	sum.hours = time1->hours + time2->hours;
+	sum.minutes = time1->minutes + time2->minutes;
+	if (sum.minutes >= NUM_MINUTES) {
+		sum.hours++;
+		sum.minutes -= NUM_MINUTES;
 	}
-	return result;
+	return sum;
 }
 
 /*----------------------
- |  READ FUNTIONS
+ |  READ FUNTIONS		|
  -----------------------*/
 
+/* Reads day, month and year from stdin and puts them into date */
 void read_date(Date* date) {
-	int year, month, day;
+	int day, month, year;
 
 	scanf(IN_DATE_FORMAT, &day, &month, &year);
 	init_date(date, day, month, year);
 }
 
+/* Reads minutes and hours from stdin and puts them into time */
 void read_time(Time* time) {
 	int minutes, hours;
 
-	scanf(IN_TIME_FORMAT, &minutes, &hours);
-	init_time(time, minutes, hours);
+	scanf(IN_TIME_FORMAT, &hours, &minutes);
+	init_time(time, hours, minutes);
 }
 
 /*----------------------
- |  PRINT FUNTIONS
+ |  PRINT FUNTIONS		|
  -----------------------*/
+
+/* Prints airport in formatted form */
+void print_airport(Airport* airport) {
+	int num_flights = get_num_flights(airport->id);
+	printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
+		   num_flights);
+}
+
+/* Prints flight in formatted form */
+void print_flight(Flight* flight, char mode) {
+	switch (mode) {
+		case 'c':
+			printf(FLIGHT_STRING_REDUCED, flight->id, flight->departure->id);
+			break;
+		case 'p':
+			printf(FLIGHT_STRING_REDUCED, flight->id, flight->arrival->id);
+			break;
+		default:
+			printf(FLIGHT_STRING, flight->id, flight->departure->id,
+				   flight->arrival->id);
+			break;
+	}
+	if (mode == 'c') {
+		print_date(&flight->arrival_date);
+		putchar(' ');
+		print_time(&flight->arrival_time);
+		putchar('\n');
+	} else {
+		print_date(&flight->departure_date);
+		putchar(' ');
+		print_time(&flight->departure_time);
+		putchar('\n');
+	}
+}
 
 /* Prints date in formatted form */
 void print_date(Date* date) {
@@ -229,9 +262,10 @@ void print_time(Time* time) {
 }
 
 /*----------------------
- |  ERROR FUNTIONS
+ |    ERROR FUNTIONS	|
  -----------------------*/
 
+/* Handles all errors for add_flight */
 int flight_error_handler(char* flight_id, Date* departure_date,
 						 char* arrival_id, char* departure_id) {
 	if (!isvalid_flight_id(flight_id)) {
@@ -257,9 +291,17 @@ int flight_error_handler(char* flight_id, Date* departure_date,
 	return 0;
 }
 
+/*----------------------
+ |   SORTING FUNTIONS	|
+ -----------------------*/
+
+/* Insertion sort flights by arrival date and time */
 void sort_arrivals() {
 	int i, j;
 	Flight* temp;
+
+	if (is_arrivals_sorted) return;
+	is_arrivals_sorted = 1;
 
 	for (i = 1; i < flights_count; i++) {
 		temp = sorted_flights_arr[i];
@@ -274,9 +316,14 @@ void sort_arrivals() {
 		sorted_flights_arr[j + 1] = temp;
 	}
 }
+
+/* Insertion sort flights by departure date and time */
 void sort_departures() {
 	int i, j;
 	Flight* temp;
+
+	if (is_departures_sorted) return;
+	is_departures_sorted = 1;
 
 	for (i = 1; i < flights_count; i++) {
 		temp = sorted_flights_dep[i];

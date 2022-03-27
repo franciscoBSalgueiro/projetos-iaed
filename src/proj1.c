@@ -18,8 +18,9 @@ Flight* sorted_flights_dep[MAX_FLIGHTS];
 Flight* sorted_flights_arr[MAX_FLIGHTS];
 int is_departures_sorted = 0;
 int is_arrivals_sorted = 0;
-Date date = {1, 1, 2022};
+Date date = {1, 1, 2022}; /* Default initial date */
 
+/* Reads command prefixes and calls the respective function */
 int main() {
 	char c;
 	while ((c = getchar()) != 'q') {
@@ -34,15 +35,18 @@ int main() {
 				add_flight();
 				break;
 			case 'p':
+				sort_departures();
 				list_flights('p');
 				break;
 			case 'c':
+				sort_arrivals();
 				list_flights('c');
 				break;
 			case 't':
 				change_date();
 				break;
 			default:
+				/* ignores unknown commands */
 				break;
 		}
 	}

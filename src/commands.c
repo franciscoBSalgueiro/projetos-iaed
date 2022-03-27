@@ -14,7 +14,7 @@
  |  -A COMMAND
  -----------------------*/
 
-/* Adds an airport to the  state */
+/* Adds a new airport to the system */
 int add_airport() {
 	unsigned int i, l;
 	int n, ins_index;
@@ -63,10 +63,10 @@ int add_airport() {
  |  -L COMMAND
  -----------------------*/
 
+/* Lists all airports in the system */
 int list_airports() {
-	int i, num_flights, has_argument;
+	int i, has_argument;
 	char airportID[AIRPORT_ID_LENGTH];
-	Airport* airport;
 
 	has_argument = 0;
 	while (getchar() != '\n') {
@@ -77,17 +77,11 @@ int list_airports() {
 			printf(NO_SUCH_AIRPORT, airportID);
 			continue;
 		}
-		airport = sorted_airports[i];
-		num_flights = get_num_flights(airport->id);
-		printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
-			   num_flights);
+		print_airport(sorted_airports[i]);
 	}
 	if (!has_argument) {
 		for (i = 0; i < airports_count; i++) {
-			airport = sorted_airports[i];
-			num_flights = get_num_flights(airport->id);
-			printf(AIRPORT_STRING, airport->id, airport->city, airport->country,
-				   num_flights);
+			print_airport(sorted_airports[i]);
 		}
 	}
 	return 0;
@@ -97,10 +91,11 @@ int list_airports() {
  |  -V, P AND C COMMAND
  -----------------------*/
 
+/* Lists all flights in the system */
 int list_flights(char mode) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
-	Flight flight;
+	Flight* flight;
 
 	if (mode != 'n') {
 		scanf("%s", airport_id);
@@ -108,55 +103,20 @@ int list_flights(char mode) {
 			printf(NO_SUCH_AIRPORT, airport_id);
 			return -1;
 		}
-		if (mode == 'c') {
-			if (!is_arrivals_sorted) {
-				is_arrivals_sorted = 1;
-				sort_arrivals();
-			}
-		} else {
-			if (!is_departures_sorted) {
-				is_departures_sorted = 1;
-				sort_departures();
-			}
-		}
 	}
 
 	for (i = 0; i < flights_count; i++) {
 		if (mode == 'n') {
-			flight = flights[i];
+			flight = &flights[i];
 		} else if (mode == 'c') {
-			flight = *sorted_flights_arr[i];
+			flight = sorted_flights_arr[i];
 		} else {
-			flight = *sorted_flights_dep[i];
+			flight = sorted_flights_dep[i];
 		}
 		if (mode == 'n' ||
-			(mode == 'c' && strcmp(flight.arrival->id, airport_id) == 0) ||
-			(mode == 'p' && strcmp(flight.departure->id, airport_id) == 0)) {
-			switch (mode) {
-				case 'c':
-					printf(FLIGHT_STRING_REDUCED, flight.id,
-						   flight.departure->id);
-					break;
-				case 'p':
-					printf(FLIGHT_STRING_REDUCED, flight.id,
-						   flight.arrival->id);
-					break;
-				default:
-					printf(FLIGHT_STRING, flight.id, flight.departure->id,
-						   flight.arrival->id);
-					break;
-			}
-			if (mode == 'c') {
-				print_date(&flight.arrival_date);
-				putchar(' ');
-				print_time(&flight.arrival_time);
-				putchar('\n');
-			} else {
-				print_date(&flight.departure_date);
-				putchar(' ');
-				print_time(&flight.departure_time);
-				putchar('\n');
-			}
+			(mode == 'c' && strcmp(flight->arrival->id, airport_id) == 0) ||
+			(mode == 'p' && strcmp(flight->departure->id, airport_id) == 0)) {
+			print_flight(flight, mode);
 		}
 	}
 	return 0;
@@ -166,7 +126,7 @@ int list_flights(char mode) {
  |  -V COMMAND
  -----------------------*/
 
-/* Adds a flight to the  state */
+/* Adds a new flight to the system */
 int add_flight() {
 	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
@@ -199,8 +159,8 @@ int add_flight() {
 
 	future_date = date;
 	future_date.year++;
-	if (compare_dates(&departure_date, &date) < 0 ||
-		compare_dates(&departure_date, &future_date) > 0) {
+	if (compare_date(&departure_date, &date) < 0 ||
+		compare_date(&departure_date, &future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}
@@ -246,6 +206,7 @@ int add_flight() {
  |  -T COMMAND
  -----------------------*/
 
+/* Changes the system date */
 int change_date() {
 	Date new_date;
 	Date future_date;
@@ -253,8 +214,8 @@ int change_date() {
 	read_date(&new_date);
 	future_date = date;
 	future_date.year++;
-	if (compare_dates(&new_date, &date) < 0 ||
-		compare_dates(&new_date, &future_date) > 0) {
+	if (compare_date(&new_date, &date) < 0 ||
+		compare_date(&new_date, &future_date) > 0) {
 		printf(INVALID_DATE);
 		return -1;
 	}

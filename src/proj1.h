@@ -4,7 +4,10 @@
  * Description: Constants, globals, structs and prototypes for proj1.c
  */
 
-/* CONSTANTS */
+/*----------------------
+ |  CONSTANTS & MACROS  |
+ -----------------------*/
+
 #define MAX_FLIGHTS 30000
 #define MAX_AIRPORTS 40
 
@@ -42,13 +45,16 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
-/* ARGUMENT FORMATS */
+/* DATE & TIME FORMATS */
 #define IN_DATE_FORMAT "%d-%d-%d"
 #define OUT_DATE_FORMAT "%02d-%02d-%d"
 #define IN_TIME_FORMAT "%d:%d"
 #define OUT_TIME_FORMAT "%02d:%02d"
 
-/* STRUCTS */
+/*--------------
+ |   STRUCTS 	|
+ ---------------*/
+
 typedef struct Airport {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
@@ -78,43 +84,69 @@ typedef struct Flight {
 	int capacity;
 } Flight;
 
-/* Global Variables */
+/*----------------------
+ |   GLOBAL VARIABLES	|
+ -----------------------*/
+
+/* Number of airports and flights added */
 extern int airports_count, flights_count;
+
+/* Airport arrays */
 extern Airport airports[MAX_AIRPORTS];
-extern Airport* sorted_airports[MAX_AIRPORTS];
+extern Airport* sorted_airports[MAX_AIRPORTS]; /* Sorted by ID */
+
+/* Flight arrays */
 extern Flight flights[MAX_FLIGHTS];
-extern Flight* sorted_flights_dep[MAX_FLIGHTS];
-extern Flight* sorted_flights_arr[MAX_FLIGHTS];
+extern Flight* sorted_flights_dep[MAX_FLIGHTS]; /* Sorted by departure date */
+extern Flight* sorted_flights_arr[MAX_FLIGHTS]; /* Sorted by arrival date */
+
+/* Boolean to avoid sorting if no changes were made to the arrays */
 extern int is_departures_sorted, is_arrivals_sorted;
+
+/* Current system date */
 extern Date date;
 
-/* Function Prototypes */
+/*----------------------
+ | FUNCTION PROTOTYPES	|
+ -----------------------*/
+
+/* commands.c */
 int add_airport();
-int add_flight();
 int list_airports();
 int list_flights(char mode);
-int isvalid_flight_id(char* id);
+int add_flight();
+int change_date();
+
+/* auxiliary.c */
+int get_airport(char id[]);
 int get_flight(char id[], Date* date);
 int get_num_flights(char* id);
-int get_airport(char id[]);
-int change_date();
-int compare_dates(Date* date1, Date* date2);
-int compare_time(Time* time1, Time* time2);
-int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
+int isvalid_flight_id(char* id);
+
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
+void init_airport(Airport* airport, char* id, char* country, char* city);
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
 				 Date* arrival_date, Time* arrival_time, int capacity);
-void init_airport(Airport* airport, char* id, char* country, char* city);
+
+int compare_date(Date* date1, Date* date2);
+int compare_time(Time* time1, Time* time2);
+int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
+
+Date increment_date(Date date);
+Time sum_time(Time* time, Time* duration);
+
 void read_date(Date* date);
 void read_time(Time* time);
-void read_airport(Airport* airport);
+
+void print_airport(Airport* airport);
+void print_flight(Flight* flight, char mode);
 void print_date(Date* date);
 void print_time(Time* time);
-void sort_arrivals();
-void sort_departures();
-Time sum_time(Time* time, Time* duration);
-Date increment_date(Date date);
+
 int flight_error_handler(char* flight_id, Date* departure_date,
 						 char* arrival_id, char* departure_id);
+
+void sort_arrivals();
+void sort_departures();
