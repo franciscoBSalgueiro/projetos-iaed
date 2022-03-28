@@ -133,11 +133,12 @@ void init_date(Date* date, int day, int month, int year);
 void init_airport(Airport* airport, char* id, char* country, char* city);
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
-				 Date* arrival_date, Time* arrival_time, int capacity);
+				 int capacity);
 
 int compare_date(Date* date1, Date* date2);
 int compare_time(Time* time1, Time* time2);
 int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
+void calculate_arrival(Flight* flight);
 
 Date increment_date(Date date);
 Time sum_time(Time* time, Time* duration);
@@ -150,8 +151,8 @@ void print_flight(Flight* flight, char mode);
 void print_date(Date* date);
 void print_time(Time* time);
 
-int has_error_flight(char* flight_id, Date* departure_date,
-						 char* arrival_id, char* departure_id);
+int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
+					 char* departure_id, Time duration, int capacity);
 
 void sort_arrivals();
 void sort_departures();

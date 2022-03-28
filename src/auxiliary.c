@@ -89,14 +89,12 @@ void init_airport(Airport* airport, char* id, char* country, char* city) {
 
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
-				 Date* arrival_date, Time* arrival_time, int capacity) {
+				 int capacity) {
 	strcpy(flight->id, id);
 	flight->departure = departure;
 	flight->arrival = arrival;
 	flight->departure_date = *departure_date;
-	flight->arrival_date = *arrival_date;
 	flight->departure_time = *departure_time;
-	flight->arrival_time = *arrival_time;
 	flight->duration = *duration;
 	flight->capacity = capacity;
 }
@@ -195,6 +193,16 @@ Time sum_time(Time* time1, Time* time2) {
 	return sum;
 }
 
+void calculate_arrival(Flight* flight) {
+	flight->arrival_time = sum_time(&flight->departure_time, &flight->duration);
+	if (flight->arrival_time.hours >= NUM_HOURS) {
+		flight->arrival_time.hours -= NUM_HOURS;
+		flight->arrival_date = increment_date(flight->departure_date);
+	} else {
+		flight->arrival_date = flight->departure_date;
+	}
+}
+
 /*----------------------
  |  READ FUNTIONS		|
  -----------------------*/
@@ -269,8 +277,9 @@ void print_time(Time* time) {
  -----------------------*/
 
 /* Handles all errors for add_flight */
-int has_error_flight(char* flight_id, Date* departure_date,
-						 char* arrival_id, char* departure_id) {
+int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
+					 char* departure_id, Time duration, int capacity) {
+	Date future_date;
 	if (!isvalid_flight_id(flight_id)) {
 		printf(INVALID_FLIGHT);
 		return TRUE;
@@ -289,6 +298,23 @@ int has_error_flight(char* flight_id, Date* departure_date,
 	}
 	if (flights_count == MAX_FLIGHTS) {
 		printf(TOO_MANY_FLIGHTS);
+		return TRUE;
+	}
+	future_date = date;
+	future_date.year++;
+	if (compare_date(departure_date, &date) < 0 ||
+		compare_date(departure_date, &future_date) > 0) {
+		printf(INVALID_DATE);
+		return TRUE;
+	}
+
+	if (duration.hours > MAX_DURATION ||
+		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
+		printf(INVALID_DURATION);
+		return TRUE;
+	}
+	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY) {
+		printf(INVALID_CAPACITY);
 		return TRUE;
 	}
 	return FALSE;

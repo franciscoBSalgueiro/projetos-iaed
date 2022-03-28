@@ -131,8 +131,8 @@ int add_flight() {
 	char arrival_id[AIRPORT_ID_LENGTH];
 	Airport* departure;
 	Airport* arrival;
-	Date departure_date, arrival_date, future_date;
-	Time departure_time, arrival_time, duration;
+	Date departure_date;
+	Time departure_time, duration;
 	int capacity;
 	Flight flight;
 	char c;
@@ -142,34 +142,15 @@ int add_flight() {
 		list_flights('n');
 		return 0;
 	}
-	scanf("%s", flight_id);
-	scanf("%s", departure_id);
-	scanf("%s", arrival_id);
 
+	scanf("%s %s %s", flight_id, departure_id, arrival_id);
 	read_date(&departure_date);
 	read_time(&departure_time);
 	read_time(&duration);
 	scanf("%d", &capacity);
 
-	if (has_error_flight(flight_id, &departure_date, arrival_id,
-							 departure_id))
-		return ERROR;
-
-	future_date = date;
-	future_date.year++;
-	if (compare_date(&departure_date, &date) < 0 ||
-		compare_date(&departure_date, &future_date) > 0) {
-		printf(INVALID_DATE);
-		return ERROR;
-	}
-
-	if (duration.hours > MAX_DURATION ||
-		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
-		printf(INVALID_DURATION);
-		return ERROR;
-	}
-	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY) {
-		printf(INVALID_CAPACITY);
+	if (has_error_flight(flight_id, &departure_date, arrival_id, departure_id,
+						 duration, capacity)) {
 		return ERROR;
 	}
 
@@ -177,19 +158,8 @@ int add_flight() {
 	departure = sorted_airports[get_airport(departure_id)];
 
 	init_flight(&flight, flight_id, departure, arrival, &departure_date,
-				&departure_time, &duration, &arrival_date, &arrival_time,
-				capacity);
-
-	arrival_time = sum_time(&departure_time, &duration);
-	if (arrival_time.hours >= NUM_HOURS) {
-		arrival_time.hours -= NUM_HOURS;
-		arrival_date = increment_date(departure_date);
-	} else {
-		arrival_date = departure_date;
-	}
-
-	flight.arrival_date = arrival_date;
-	flight.arrival_time = arrival_time;
+				&departure_time, &duration, capacity);
+	calculate_arrival(&flight);
 
 	flights[flights_count] = flight;
 	sorted_flights_arr[flights_count] = &flights[flights_count];
