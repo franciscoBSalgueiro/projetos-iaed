@@ -23,24 +23,22 @@ int add_airport() {
 	char city[MAX_CITY_NAME_LENGTH];
 	Airport airport;
 
-	scanf("%s", airport_id);
-	scanf("%s", country);
-	scanf(" %[^\n]", city); /* includes everything until end of line */
+	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
 
 	l = strlen(airport_id);
 	for (i = 0; i < l; i++) {
 		if (!isupper((airport_id[i]))) {
 			printf(INVALID_AIRPORT_ID);
-			return -1;
+			return ERROR;
 		}
 	}
 	if (airports_count == MAX_AIRPORTS) {
 		printf(TOO_MANY_AIPORTS);
-		return -1;
+		return ERROR;
 	}
 	if ((ins_index = get_airport(airport_id)) >= 0) {
 		printf(DUPLICATE_AIRPORT);
-		return -1;
+		return ERROR;
 	}
 
 	init_airport(&airport, airport_id, country, city);
@@ -101,7 +99,7 @@ int list_flights(char mode) {
 		scanf("%s", airport_id);
 		if (get_airport(airport_id) < 0) {
 			printf(NO_SUCH_AIRPORT, airport_id);
-			return -1;
+			return ERROR;
 		}
 	}
 
@@ -153,26 +151,26 @@ int add_flight() {
 	read_time(&duration);
 	scanf("%d", &capacity);
 
-	if (flight_error_handler(flight_id, &departure_date, arrival_id,
+	if (has_error_flight(flight_id, &departure_date, arrival_id,
 							 departure_id))
-		return -1;
+		return ERROR;
 
 	future_date = date;
 	future_date.year++;
 	if (compare_date(&departure_date, &date) < 0 ||
 		compare_date(&departure_date, &future_date) > 0) {
 		printf(INVALID_DATE);
-		return -1;
+		return ERROR;
 	}
 
 	if (duration.hours > MAX_DURATION ||
 		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
 		printf(INVALID_DURATION);
-		return -1;
+		return ERROR;
 	}
 	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY) {
 		printf(INVALID_CAPACITY);
-		return -1;
+		return ERROR;
 	}
 
 	arrival = sorted_airports[get_airport(arrival_id)];
@@ -217,7 +215,7 @@ int change_date() {
 	if (compare_date(&new_date, &date) < 0 ||
 		compare_date(&new_date, &future_date) > 0) {
 		printf(INVALID_DATE);
-		return -1;
+		return ERROR;
 	}
 	date = new_date;
 

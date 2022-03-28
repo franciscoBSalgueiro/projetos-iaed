@@ -29,6 +29,7 @@ int get_airport(char id[]) {
 	return -left - 1;
 }
 
+/* returns index of flight or -1 if it doesn't exist */
 int get_flight(char id[], Date* date) {
 	int i;
 	for (i = 0; i < flights_count; i++) {
@@ -40,6 +41,7 @@ int get_flight(char id[], Date* date) {
 	return -1;
 }
 
+/* returns number of flights by airport */
 int get_num_flights(char* id) {
 	int i, count = 0;
 	for (i = 0; i < flights_count; i++) {
@@ -55,14 +57,14 @@ int isvalid_flight_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
 	if (l < 3 || l > 6 || !isupper(id[0]) || !isupper(id[1])) {
-		return 0;
+		return FALSE;
 	}
 	for (i = 2; i < l; i++) {
 		if (!isdigit(id[i])) {
-			return 0;
+			return FALSE;
 		}
 	}
-	return 1;
+	return TRUE;
 }
 
 /*--------------------------
@@ -226,6 +228,7 @@ void print_airport(Airport* airport) {
 
 /* Prints flight in formatted form */
 void print_flight(Flight* flight, char mode) {
+	/* REPEATED CODE HERE */
 	switch (mode) {
 		case 'c':
 			printf(FLIGHT_STRING_REDUCED, flight->id, flight->departure->id);
@@ -266,34 +269,36 @@ void print_time(Time* time) {
  -----------------------*/
 
 /* Handles all errors for add_flight */
-int flight_error_handler(char* flight_id, Date* departure_date,
+int has_error_flight(char* flight_id, Date* departure_date,
 						 char* arrival_id, char* departure_id) {
 	if (!isvalid_flight_id(flight_id)) {
 		printf(INVALID_FLIGHT);
-		return 1;
+		return TRUE;
 	}
 	if (get_flight(flight_id, departure_date) >= 0) {
 		printf(FLIGHT_ALREADY_EXISTS);
-		return 1;
+		return TRUE;
 	}
 	if (get_airport(departure_id) < 0) {
 		printf(NO_SUCH_AIRPORT, departure_id);
-		return 1;
+		return TRUE;
 	}
 	if (get_airport(arrival_id) < 0) {
 		printf(NO_SUCH_AIRPORT, arrival_id);
-		return 1;
+		return TRUE;
 	}
 	if (flights_count == MAX_FLIGHTS) {
 		printf(TOO_MANY_FLIGHTS);
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
 /*----------------------
  |   SORTING FUNTIONS	|
  -----------------------*/
+
+/* REPEATED CODE HERE */
 
 /* Insertion sort flights by arrival date and time */
 void sort_arrivals() {

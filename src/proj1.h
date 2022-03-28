@@ -8,6 +8,10 @@
  |  CONSTANTS & MACROS  |
  -----------------------*/
 
+#define TRUE 1
+#define FALSE 0
+#define ERROR -1
+
 #define MAX_FLIGHTS 30000
 #define MAX_AIRPORTS 40
 
@@ -45,7 +49,8 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define FLIGHT_STRING "%s %s %s "
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
-/* DATE & TIME FORMATS */
+/* ARGUMENT FORMATS */
+#define IN_AIRPORT_FORMAT "%s %s %[^\n]"
 #define IN_DATE_FORMAT "%d-%d-%d"
 #define OUT_DATE_FORMAT "%02d-%02d-%d"
 #define IN_TIME_FORMAT "%d:%d"
@@ -145,7 +150,7 @@ void print_flight(Flight* flight, char mode);
 void print_date(Date* date);
 void print_time(Time* time);
 
-int flight_error_handler(char* flight_id, Date* departure_date,
+int has_error_flight(char* flight_id, Date* departure_date,
 						 char* arrival_id, char* departure_id);
 
 void sort_arrivals();
