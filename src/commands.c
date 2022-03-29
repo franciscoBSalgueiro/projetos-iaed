@@ -86,46 +86,6 @@ int list_airports() {
 }
 
 /*----------------------
- |  -V, P AND C COMMAND
- -----------------------*/
-
-/* Lists all flights in the system */
-int list_flights(char mode) {
-	int i;
-	char airport_id[AIRPORT_ID_LENGTH];
-	Flight* flight;
-
-	scanf("%s", airport_id);
-	if (get_airport(airport_id) < 0) {
-		printf(NO_SUCH_AIRPORT, airport_id);
-		return ERROR;
-	}
-	for (i = 0; i < flights_count; i++) {
-		if (mode == 'c') {
-			flight = sorted_flights_arr[i];
-		} else {
-			flight = sorted_flights_dep[i];
-		}
-		if (mode == 'c' && strcmp(sorted_flights_arr[i]->arrival->id, airport_id) == 0) {
-			print_flight(flight, get_departure, get_flight_arrival_date,
-						 get_flight_arrival_time);
-		}
-		if (mode == 'p' && strcmp(sorted_flights_dep[i]->departure->id, airport_id) == 0) {
-			print_flight(flight, get_arrival, get_flight_departure_date,
-						 get_flight_departure_time);
-		}
-	}
-	return 0;
-}
-
-void list_all_flights() {
-	int i;
-	for (i = 0; i < flights_count; i++) {
-		print_flight_full(&flights[i]);
-	}
-}
-
-/*----------------------
  |  -V COMMAND
  -----------------------*/
 
@@ -165,6 +125,45 @@ int add_flight() {
 	flights_count++;
 	is_departures_sorted = 0;
 	is_arrivals_sorted = 0;
+	return 0;
+}
+
+/* Lists all flights in the system */
+void list_all_flights() {
+	int i;
+	for (i = 0; i < flights_count; i++) {
+		print_flight_full(&flights[i]);
+	}
+}
+
+/*----------------------
+ |  - P AND C COMMAND
+ -----------------------*/
+
+/* Lists arrival (mode a) or departure (mode p) flights in the airport provided */
+int list_flights(char mode) {
+	int i;
+	char airport_id[AIRPORT_ID_LENGTH];
+	Flight* flight;
+
+	scanf("%s", airport_id);
+	if (get_airport(airport_id) < 0) {
+		printf(NO_SUCH_AIRPORT, airport_id);
+		return ERROR;
+	}
+	for (i = 0; i < flights_count; i++) {
+		if (mode == 'c' && strcmp((flight = sorted_flights_arr[i])->arrival->id,
+								  airport_id) == 0) {
+			print_flight(flight->id, flight->departure->id,
+						 &flight->arrival_date, &flight->arrival_time);
+		}
+		if (mode == 'p' &&
+			strcmp((flight = sorted_flights_dep[i])->departure->id,
+				   airport_id) == 0) {
+			print_flight(flight->id, flight->arrival->id,
+						 &flight->departure_date, &flight->departure_time);
+		}
+	}
 	return 0;
 }
 

@@ -71,27 +71,27 @@ int isvalid_flight_id(char* id) {
  |  INTIALIAZING FUNTIONS	|
  ---------------------------*/
 
-/* Defines values for the Time struct */
+/* Initializes values for the Time struct */
 void init_time(Time* time, int hours, int minutes) {
 	time->hours = hours;
 	time->minutes = minutes;
 }
 
-/* Defines values for the Date struct */
+/* Initializes values for the Date struct */
 void init_date(Date* date, int day, int month, int year) {
 	date->day = day;
 	date->month = month;
 	date->year = year;
 }
 
-/* Defines values for the Airport struct */
+/* Initializes values for the Airport struct */
 void init_airport(Airport* airport, char* id, char* country, char* city) {
 	strcpy(airport->id, id);
 	strcpy(airport->country, country);
 	strcpy(airport->city, city);
 }
 
-/* Defines values for the Flight struct */
+/* Initializes values for the Flight struct */
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
 				 int capacity) {
@@ -172,7 +172,7 @@ int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
  |   DATE & TIME FUNTIONS	|
  ---------------------------*/
 
-/* Adds one day to date */
+/* Return date incremented by one day */
 Date increment_date(Date date) {
 	date.day++;
 	if (date.day > MONTH_DAYS[date.month - 1]) {
@@ -240,16 +240,16 @@ void print_airport(Airport* airport) {
 		   num_flights);
 }
 
-/* Prints flight in formatted form */
-void print_flight(Flight* flight, Airport* (*get_airport)(Flight*),
-				  Date* (*get_date)(Flight*), Time* (*get_time)(Flight*)) {
-	printf(FLIGHT_STRING_REDUCED, flight->id, get_airport(flight)->id);
-	print_date(get_date(flight));
+/* Prints flight in formatted form for the c and p commands */
+void print_flight(char* id, char* airport_id, Date* date, Time* time) {
+	printf(FLIGHT_STRING_REDUCED, id, airport_id);
+	print_date(date);
 	putchar(' ');
-	print_time(get_time(flight));
+	print_time(time);
 	putchar('\n');
 }
 
+/* Prints flight in formatted form for the v command */
 void print_flight_full(Flight* flight) {
 	printf(FLIGHT_STRING, flight->id, flight->departure->id,
 		   flight->arrival->id);
@@ -323,7 +323,7 @@ int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 
 /* REPEATED CODE HERE */
 
-/* Insertion sort flights by arrival date and time */
+/* Insertion sorts flights by arrival date and time */
 void sort_arrivals() {
 	int i, j;
 	Flight* temp;
@@ -345,7 +345,7 @@ void sort_arrivals() {
 	}
 }
 
-/* Insertion sort flights by departure date and time */
+/* Insertion sorts flights by departure date and time */
 void sort_departures() {
 	int i, j;
 	Flight* temp;
