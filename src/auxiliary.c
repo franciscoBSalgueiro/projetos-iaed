@@ -52,7 +52,7 @@ int get_num_flights(char* id) {
 	return count;
 }
 
-/* Returns 1 if the flightID is valid, otherwise returns 0 */
+/* Returns TRUE if the flightID is valid, otherwise returns FALSE */
 int isvalid_flight_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
@@ -71,22 +71,27 @@ int isvalid_flight_id(char* id) {
  |  INTIALIAZING FUNTIONS	|
  ---------------------------*/
 
+/* Defines values for the Time struct */
 void init_time(Time* time, int hours, int minutes) {
 	time->hours = hours;
 	time->minutes = minutes;
 }
+
+/* Defines values for the Date struct */
 void init_date(Date* date, int day, int month, int year) {
 	date->day = day;
 	date->month = month;
 	date->year = year;
 }
 
+/* Defines values for the Airport struct */
 void init_airport(Airport* airport, char* id, char* country, char* city) {
 	strcpy(airport->id, id);
 	strcpy(airport->country, country);
 	strcpy(airport->city, city);
 }
 
+/* Defines values for the Flight struct */
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
 				 int capacity) {
@@ -145,7 +150,7 @@ int compare_time(Time* time1, Time* time2) {
 	return 0;
 }
 
-/* Combines the two previous funcitons */
+/* Combines the two previous functions */
 int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	int d, t;
 	if ((d = compare_date(date1, date2)) < 0) {
@@ -181,7 +186,7 @@ Date increment_date(Date date) {
 	return date;
 }
 
-/* Sums two times */
+/* Returns the sum of two times */
 Time sum_time(Time* time1, Time* time2) {
 	Time sum;
 	sum.hours = time1->hours + time2->hours;
@@ -193,6 +198,7 @@ Time sum_time(Time* time1, Time* time2) {
 	return sum;
 }
 
+/* Calculates the arrival date and time of a flight */
 void calculate_arrival(Flight* flight) {
 	flight->arrival_time = sum_time(&flight->departure_time, &flight->duration);
 	if (flight->arrival_time.hours >= NUM_HOURS) {
@@ -235,31 +241,22 @@ void print_airport(Airport* airport) {
 }
 
 /* Prints flight in formatted form */
-void print_flight(Flight* flight, char mode) {
-	/* REPEATED CODE HERE */
-	switch (mode) {
-		case 'c':
-			printf(FLIGHT_STRING_REDUCED, flight->id, flight->departure->id);
-			break;
-		case 'p':
-			printf(FLIGHT_STRING_REDUCED, flight->id, flight->arrival->id);
-			break;
-		default:
-			printf(FLIGHT_STRING, flight->id, flight->departure->id,
-				   flight->arrival->id);
-			break;
-	}
-	if (mode == 'c') {
-		print_date(&flight->arrival_date);
-		putchar(' ');
-		print_time(&flight->arrival_time);
-		putchar('\n');
-	} else {
-		print_date(&flight->departure_date);
-		putchar(' ');
-		print_time(&flight->departure_time);
-		putchar('\n');
-	}
+void print_flight(Flight* flight, Airport* (*get_airport)(Flight*),
+				  Date* (*get_date)(Flight*), Time* (*get_time)(Flight*)) {
+	printf(FLIGHT_STRING_REDUCED, flight->id, get_airport(flight)->id);
+	print_date(get_date(flight));
+	putchar(' ');
+	print_time(get_time(flight));
+	putchar('\n');
+}
+
+void print_flight_full(Flight* flight) {
+	printf(FLIGHT_STRING, flight->id, flight->departure->id,
+		   flight->arrival->id);
+	print_date(&flight->departure_date);
+	putchar(' ');
+	print_time(&flight->departure_time);
+	putchar('\n');
 }
 
 /* Prints date in formatted form */

@@ -119,6 +119,7 @@ extern Date date;
 int add_airport();
 int list_airports();
 int list_flights(char mode);
+void list_all_flights();
 int add_flight();
 int change_date();
 
@@ -147,7 +148,9 @@ void read_date(Date* date);
 void read_time(Time* time);
 
 void print_airport(Airport* airport);
-void print_flight(Flight* flight, char mode);
+void print_flight(Flight* flight, Airport* (*get_airport)(Flight*),
+				  Date* (*get_date)(Flight*), Time* (*get_time)(Flight*));
+void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
 
@@ -156,3 +159,10 @@ int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 
 void sort_arrivals();
 void sort_departures();
+
+Airport* get_departure(Flight* flight);
+Airport* get_arrival(Flight* flight);
+Date* get_flight_arrival_date(Flight* flight);
+Date* get_flight_departure_date(Flight* flight);
+Time* get_flight_arrival_time(Flight* flight);
+Time* get_flight_departure_time(Flight* flight);

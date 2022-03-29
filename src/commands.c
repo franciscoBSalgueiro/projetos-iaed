@@ -95,29 +95,34 @@ int list_flights(char mode) {
 	char airport_id[AIRPORT_ID_LENGTH];
 	Flight* flight;
 
-	if (mode != 'n') {
-		scanf("%s", airport_id);
-		if (get_airport(airport_id) < 0) {
-			printf(NO_SUCH_AIRPORT, airport_id);
-			return ERROR;
-		}
+	scanf("%s", airport_id);
+	if (get_airport(airport_id) < 0) {
+		printf(NO_SUCH_AIRPORT, airport_id);
+		return ERROR;
 	}
-
 	for (i = 0; i < flights_count; i++) {
-		if (mode == 'n') {
-			flight = &flights[i];
-		} else if (mode == 'c') {
+		if (mode == 'c') {
 			flight = sorted_flights_arr[i];
 		} else {
 			flight = sorted_flights_dep[i];
 		}
-		if (mode == 'n' ||
-			(mode == 'c' && strcmp(flight->arrival->id, airport_id) == 0) ||
-			(mode == 'p' && strcmp(flight->departure->id, airport_id) == 0)) {
-			print_flight(flight, mode);
+		if (mode == 'c' && strcmp(sorted_flights_arr[i]->arrival->id, airport_id) == 0) {
+			print_flight(flight, get_departure, get_flight_arrival_date,
+						 get_flight_arrival_time);
+		}
+		if (mode == 'p' && strcmp(sorted_flights_dep[i]->departure->id, airport_id) == 0) {
+			print_flight(flight, get_arrival, get_flight_departure_date,
+						 get_flight_departure_time);
 		}
 	}
 	return 0;
+}
+
+void list_all_flights() {
+	int i;
+	for (i = 0; i < flights_count; i++) {
+		print_flight_full(&flights[i]);
+	}
 }
 
 /*----------------------
@@ -135,13 +140,6 @@ int add_flight() {
 	Time departure_time, duration;
 	int capacity;
 	Flight flight;
-	char c;
-
-	c = getchar();
-	if (c == '\n') {
-		list_flights('n');
-		return 0;
-	}
 
 	scanf("%s %s %s", flight_id, departure_id, arrival_id);
 	read_date(&departure_date);

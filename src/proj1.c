@@ -32,7 +32,10 @@ int main() {
 				list_airports();
 				break;
 			case 'v':
-				add_flight();
+				if (getchar() == '\n')
+					list_all_flights();
+				else
+					add_flight();
 				break;
 			case 'p':
 				sort_departures();
@@ -51,4 +54,20 @@ int main() {
 		}
 	}
 	return 0;
+}
+
+Airport* get_departure(Flight* flight) { return flight->departure; }
+
+Airport* get_arrival(Flight* flight) { return flight->arrival; }
+
+Date* get_flight_arrival_date(Flight* flight) { return &flight->arrival_date; }
+
+Date* get_flight_departure_date(Flight* flight) {
+	return &flight->departure_date;
+}
+
+Time* get_flight_arrival_time(Flight* flight) { return &flight->arrival_time; }
+
+Time* get_flight_departure_time(Flight* flight) {
+	return &flight->departure_time;
 }
