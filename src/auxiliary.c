@@ -14,10 +14,10 @@
 int get_airport(char id[]) {
 	int left, right, middle, cmp;
 	left = 0;
-	right = airports_count - 1;
+	right = system.airports_count - 1;
 	middle = (left + right) / 2;
 	while (left <= right) {
-		cmp = strcmp(airports[middle].id, id);
+		cmp = strcmp(system.airports[middle].id, id);
 		if (cmp < 0)
 			left = middle + 1;
 		else if (cmp == 0) {
@@ -32,9 +32,9 @@ int get_airport(char id[]) {
 /* returns index of flight or -1 if it doesn't exist */
 int get_flight(char id[], Date* date) {
 	int i;
-	for (i = 0; i < flights_count; i++) {
-		if (strcmp(flights[i].id, id) == 0 &&
-			compare_date(&flights->departure_date, date) == 0) {
+	for (i = 0; i < system.flights_count; i++) {
+		if (strcmp(system.flights[i].id, id) == 0 &&
+			compare_date(&system.flights->departure_date, date) == 0) {
 			return i;
 		}
 	}
@@ -44,8 +44,8 @@ int get_flight(char id[], Date* date) {
 /* returns number of flights by airport */
 int get_num_flights(char* id) {
 	int i, count = 0;
-	for (i = 0; i < flights_count; i++) {
-		if (strcmp(flights[i].departure->id, id) == 0) {
+	for (i = 0; i < system.flights_count; i++) {
+		if (strcmp(system.flights[i].departure->id, id) == 0) {
 			count++;
 		}
 	}
@@ -65,6 +65,16 @@ int isvalid_flight_id(char* id) {
 		}
 	}
 	return TRUE;
+}
+
+int has_lowercase(char* str) {
+	unsigned int i, l = strlen(str);
+	for (i = 0; i < l; i++) {
+		if (islower(str[i])) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 /*--------------------------
@@ -293,13 +303,13 @@ int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 		printf(NO_SUCH_AIRPORT, arrival_id);
 		return TRUE;
 	}
-	if (flights_count == MAX_FLIGHTS) {
+	if (system.flights_count == MAX_FLIGHTS) {
 		printf(TOO_MANY_FLIGHTS);
 		return TRUE;
 	}
-	future_date = date;
+	future_date = system.date;
 	future_date.year++;
-	if (compare_date(departure_date, &date) < 0 ||
+	if (compare_date(departure_date, &system.date) < 0 ||
 		compare_date(departure_date, &future_date) > 0) {
 		printf(INVALID_DATE);
 		return TRUE;
@@ -328,20 +338,20 @@ void sort_arrivals() {
 	int i, j;
 	Flight* temp;
 
-	if (is_arrivals_sorted) return;
-	is_arrivals_sorted = 1;
+	if (system.is_arrivals_sorted) return;
+	system.is_arrivals_sorted = 1;
 
-	for (i = 1; i < flights_count; i++) {
-		temp = sorted_flights_arr[i];
+	for (i = 1; i < system.flights_count; i++) {
+		temp = system.sorted_flights_arr[i];
 		for (j = i - 1;
 			 j >= 0 &&
 			 compare_date_and_time(
-				 &sorted_flights_arr[j]->arrival_date, &temp->arrival_date,
-				 &sorted_flights_arr[j]->arrival_time, &temp->arrival_time) > 0;
+				 &system.sorted_flights_arr[j]->arrival_date, &temp->arrival_date,
+				 &system.sorted_flights_arr[j]->arrival_time, &temp->arrival_time) > 0;
 			 j--) {
-			sorted_flights_arr[j + 1] = sorted_flights_arr[j];
+			system.sorted_flights_arr[j + 1] = system.sorted_flights_arr[j];
 		}
-		sorted_flights_arr[j + 1] = temp;
+		system.sorted_flights_arr[j + 1] = temp;
 	}
 }
 
@@ -350,19 +360,19 @@ void sort_departures() {
 	int i, j;
 	Flight* temp;
 
-	if (is_departures_sorted) return;
-	is_departures_sorted = 1;
+	if (system.is_departures_sorted) return;
+	system.is_departures_sorted = 1;
 
-	for (i = 1; i < flights_count; i++) {
-		temp = sorted_flights_dep[i];
+	for (i = 1; i < system.flights_count; i++) {
+		temp = system.sorted_flights_dep[i];
 		for (j = i - 1; j >= 0 && compare_date_and_time(
-									  &sorted_flights_dep[j]->departure_date,
+									  &system.sorted_flights_dep[j]->departure_date,
 									  &temp->departure_date,
-									  &sorted_flights_dep[j]->departure_time,
+									  &system.sorted_flights_dep[j]->departure_time,
 									  &temp->departure_time) > 0;
 			 j--) {
-			sorted_flights_dep[j + 1] = sorted_flights_dep[j];
+			system.sorted_flights_dep[j + 1] = system.sorted_flights_dep[j];
 		}
-		sorted_flights_dep[j + 1] = temp;
+		system.sorted_flights_dep[j + 1] = temp;
 	}
 }

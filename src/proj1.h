@@ -28,6 +28,9 @@
 #define NUM_HOURS 24
 #define NUM_MONTHS 12
 
+/* Default initial date */
+#define INITIAL_DATE 1, 1, 2022
+
 static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 										   31, 31, 30, 31, 30, 31};
 
@@ -60,24 +63,24 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
-typedef struct Airport {
+typedef struct {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
 } Airport;
 
-typedef struct Date {
+typedef struct {
 	int day;
 	int month;
 	int year;
 } Date;
 
-typedef struct Time {
+typedef struct {
 	int hours;
 	int minutes;
 } Time;
 
-typedef struct Flight {
+typedef struct {
 	char id[FLIGHT_ID_LENGTH];
 	Airport* departure;
 	Airport* arrival;
@@ -90,29 +93,36 @@ typedef struct Flight {
 } Flight;
 
 /*----------------------
- |   GLOBAL VARIABLES	|
+ |     GLOBAL STATE		|
  -----------------------*/
 
-/* Number of airports and flights added */
-extern int airports_count, flights_count;
+typedef struct {
+	/* Number of airports and flights added */
+	int airports_count, flights_count;
 
-/* Airport array sorted by ID */
-extern Airport airports[MAX_AIRPORTS];
+	/* Airport array sorted by ID */
+	Airport airports[MAX_AIRPORTS];
 
-/* Flight arrays */
-extern Flight flights[MAX_FLIGHTS];
-extern Flight* sorted_flights_dep[MAX_FLIGHTS]; /* Sorted by departure date */
-extern Flight* sorted_flights_arr[MAX_FLIGHTS]; /* Sorted by arrival date */
+	/* Flight arrays */
+	Flight flights[MAX_FLIGHTS];
+	Flight* sorted_flights_dep[MAX_FLIGHTS]; /* Sorted by departure date */
+	Flight* sorted_flights_arr[MAX_FLIGHTS]; /* Sorted by arrival date */
 
-/* Boolean to avoid sorting if no changes were made to the arrays */
-extern int is_departures_sorted, is_arrivals_sorted;
+	/* Boolean to avoid sorting if no changes were made to the arrays */
+	int is_departures_sorted, is_arrivals_sorted;
 
-/* Current system date */
-extern Date date;
+	/* Current system date */
+	Date date;
+} System;
+
+extern System system;
 
 /*----------------------
  | FUNCTION PROTOTYPES	|
  -----------------------*/
+
+/* main.c */
+int cmd_triage();
 
 /* commands.c */
 int add_airport();
@@ -127,6 +137,7 @@ int get_airport(char id[]);
 int get_flight(char id[], Date* date);
 int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
+int has_lowercase(char* str);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
