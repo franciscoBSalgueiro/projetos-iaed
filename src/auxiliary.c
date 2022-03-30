@@ -10,6 +10,10 @@
 
 #include "proj1.h"
 
+/*--------------------------
+ |      GET FUNCTIONS       |
+ ---------------------------*/
+
 /* returns index of airport or -index-1 if it doesn't exist */
 int get_airport(char id[]) {
 	int left, right, middle, cmp;
@@ -20,9 +24,9 @@ int get_airport(char id[]) {
 		cmp = strcmp(system.airports[middle].id, id);
 		if (cmp < 0)
 			left = middle + 1;
-		else if (cmp == 0) {
+		else if (cmp == 0)
 			return middle;
-		} else
+		else
 			right = middle - 1;
 		middle = (left + right) / 2;
 	}
@@ -32,49 +36,38 @@ int get_airport(char id[]) {
 /* returns index of flight or -1 if it doesn't exist */
 int get_flight(char id[], Date* date) {
 	int i;
-	for (i = 0; i < system.flights_count; i++) {
+	for (i = 0; i < system.flights_count; i++)
 		if (strcmp(system.flights[i].id, id) == 0 &&
 			compare_date(&system.flights->departure_date, date) == 0) {
 			return i;
 		}
-	}
 	return -1;
 }
 
 /* returns number of flights by airport */
 int get_num_flights(char* id) {
 	int i, count = 0;
-	for (i = 0; i < system.flights_count; i++) {
-		if (strcmp(system.flights[i].departure->id, id) == 0) {
-			count++;
-		}
-	}
+	for (i = 0; i < system.flights_count; i++)
+		if (strcmp(system.flights[i].departure->id, id) == 0) count++;
 	return count;
 }
 
-/* Returns TRUE if the flightID is valid, otherwise returns FALSE */
+/* Checks if the first two letters are uppercase and the rest are digits */
 int isvalid_flight_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
-	if (l < 3 || l > 6 || !isupper(id[0]) || !isupper(id[1])) {
-		return FALSE;
-	}
-	for (i = 2; i < l; i++) {
-		if (!isdigit(id[i])) {
-			return FALSE;
-		}
-	}
+	if (l < 3 || l > 6 || !isupper(id[0]) || !isupper(id[1])) return FALSE;
+	for (i = 2; i < l; i++)
+		if (!isdigit(id[i])) return FALSE;
 	return TRUE;
 }
 
-int has_lowercase(char* str) {
-	unsigned int i, l = strlen(str);
-	for (i = 0; i < l; i++) {
-		if (islower(str[i])) {
-			return TRUE;
-		}
-	}
-	return FALSE;
+/* Checks if there are no lowercase letters in the id */
+int isvalid_airport_id(char* id) {
+	unsigned int i, l = strlen(id);
+	for (i = 0; i < l; i++)
+		if (islower(id[i])) return FALSE;
+	return TRUE;
 }
 
 /*--------------------------
@@ -121,60 +114,32 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 /* Returns -1 if date1 happens before date2, 0 if the dates are equal and 1 if
  * date1 happens after date2 */
 int compare_date(Date* date1, Date* date2) {
-	if (date1->year < date2->year) {
-		return -1;
-	}
-	if (date1->year > date2->year) {
-		return 1;
-	}
-	if (date1->month < date2->month) {
-		return -1;
-	}
-	if (date1->month > date2->month) {
-		return 1;
-	}
-	if (date1->day < date2->day) {
-		return -1;
-	}
-	if (date1->day > date2->day) {
-		return 1;
-	}
+	if (date1->year < date2->year) return -1;
+	if (date1->year > date2->year) return 1;
+	if (date1->month < date2->month) return -1;
+	if (date1->month > date2->month) return 1;
+	if (date1->day < date2->day) return -1;
+	if (date1->day > date2->day) return 1;
 	return 0;
 }
 
 /* Returns -1 if time1 happens before time2, 0 if the dates are equal and 1 if
  * time1 happens after time2 */
 int compare_time(Time* time1, Time* time2) {
-	if (time1->hours < time2->hours) {
-		return -1;
-	}
-	if (time1->hours > time2->hours) {
-		return 1;
-	}
-	if (time1->minutes < time2->minutes) {
-		return -1;
-	}
-	if (time1->minutes > time2->minutes) {
-		return 1;
-	}
+	if (time1->hours < time2->hours) return -1;
+	if (time1->hours > time2->hours) return 1;
+	if (time1->minutes < time2->minutes) return -1;
+	if (time1->minutes > time2->minutes) return 1;
 	return 0;
 }
 
 /* Combines the two previous functions */
 int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	int d, t;
-	if ((d = compare_date(date1, date2)) < 0) {
-		return -1;
-	}
-	if (d > 0) {
-		return 1;
-	}
-	if ((t = compare_time(time1, time2)) < 0) {
-		return -1;
-	}
-	if (t > 0) {
-		return 1;
-	}
+	if ((d = compare_date(date1, date2)) < 0) return -1;
+	if (d > 0) return 1;
+	if ((t = compare_time(time1, time2)) < 0) return -1;
+	if (t > 0) return 1;
 	return 0;
 }
 
@@ -219,9 +184,49 @@ void calculate_arrival(Flight* flight) {
 	}
 }
 
+/* Checks if date isn't in the past or more than one year in the future */
+int isvalid_date(Date* date) {
+	Date future_date;
+	future_date = system.date;
+	future_date.year++;
+	if (compare_date(date, &system.date) < 0 ||
+		compare_date(date, &future_date) > 0) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
 /*----------------------
- |  READ FUNTIONS		|
+ |    READ FUNTIONS		|
  -----------------------*/
+
+int read_flight(Flight* new_flight) {
+	char flight_id[FLIGHT_ID_LENGTH];
+	char departure_id[AIRPORT_ID_LENGTH];
+	char arrival_id[AIRPORT_ID_LENGTH];
+	Date dep_date;
+	Time dep_time, duration;
+	int capacity;
+	Airport* departure;
+	Airport* arrival;
+
+	scanf(IN_FLIGHT_FORMAT, flight_id, departure_id, arrival_id);
+	read_date(&dep_date);
+	read_time(&dep_time);
+	read_time(&duration);
+	scanf("%d", &capacity);
+
+	if (has_error_flight(flight_id, &dep_date, arrival_id, departure_id,
+						 duration, capacity))
+		return ERROR;
+
+	departure = &system.airports[get_airport(departure_id)];
+	arrival = &system.airports[get_airport(arrival_id)];
+
+	init_flight(new_flight, flight_id, departure, arrival, &dep_date, &dep_time,
+				&duration, capacity);
+	return 0;
+}
 
 /* Reads day, month and year from stdin and puts them into date */
 void read_date(Date* date) {
@@ -251,8 +256,8 @@ void print_airport(Airport* airport) {
 }
 
 /* Prints flight in formatted form for the c and p commands */
-void print_flight(char* id, char* airport_id, Date* date, Time* time) {
-	printf(FLIGHT_STRING_REDUCED, id, airport_id);
+void print_flight(char* flight_id, char* airport_id, Date* date, Time* time) {
+	printf(FLIGHT_STRING_REDUCED, flight_id, airport_id);
 	print_date(date);
 	putchar(' ');
 	print_time(time);
@@ -286,7 +291,7 @@ void print_time(Time* time) {
 /* Handles all errors for add_flight */
 int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity) {
-	Date future_date;
+	int t;
 	if (!isvalid_flight_id(flight_id)) {
 		printf(INVALID_FLIGHT);
 		return TRUE;
@@ -295,26 +300,18 @@ int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 		printf(FLIGHT_ALREADY_EXISTS);
 		return TRUE;
 	}
-	if (get_airport(departure_id) < 0) {
-		printf(NO_SUCH_AIRPORT, departure_id);
-		return TRUE;
-	}
-	if (get_airport(arrival_id) < 0) {
-		printf(NO_SUCH_AIRPORT, arrival_id);
+	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0) {
+		printf(NO_SUCH_AIRPORT, t < 0 ? departure_id : arrival_id);
 		return TRUE;
 	}
 	if (system.flights_count == MAX_FLIGHTS) {
 		printf(TOO_MANY_FLIGHTS);
 		return TRUE;
 	}
-	future_date = system.date;
-	future_date.year++;
-	if (compare_date(departure_date, &system.date) < 0 ||
-		compare_date(departure_date, &future_date) > 0) {
+	if (!isvalid_date(departure_date)) {
 		printf(INVALID_DATE);
 		return TRUE;
 	}
-
 	if (duration.hours > MAX_DURATION ||
 		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
 		printf(INVALID_DURATION);
@@ -345,9 +342,10 @@ void sort_arrivals() {
 		temp = system.sorted_flights_arr[i];
 		for (j = i - 1;
 			 j >= 0 &&
-			 compare_date_and_time(
-				 &system.sorted_flights_arr[j]->arrival_date, &temp->arrival_date,
-				 &system.sorted_flights_arr[j]->arrival_time, &temp->arrival_time) > 0;
+			 compare_date_and_time(&system.sorted_flights_arr[j]->arrival_date,
+								   &temp->arrival_date,
+								   &system.sorted_flights_arr[j]->arrival_time,
+								   &temp->arrival_time) > 0;
 			 j--) {
 			system.sorted_flights_arr[j + 1] = system.sorted_flights_arr[j];
 		}
@@ -365,11 +363,12 @@ void sort_departures() {
 
 	for (i = 1; i < system.flights_count; i++) {
 		temp = system.sorted_flights_dep[i];
-		for (j = i - 1; j >= 0 && compare_date_and_time(
-									  &system.sorted_flights_dep[j]->departure_date,
-									  &temp->departure_date,
-									  &system.sorted_flights_dep[j]->departure_time,
-									  &temp->departure_time) > 0;
+		for (j = i - 1;
+			 j >= 0 && compare_date_and_time(
+						   &system.sorted_flights_dep[j]->departure_date,
+						   &temp->departure_date,
+						   &system.sorted_flights_dep[j]->departure_time,
+						   &temp->departure_time) > 0;
 			 j--) {
 			system.sorted_flights_dep[j + 1] = system.sorted_flights_dep[j];
 		}

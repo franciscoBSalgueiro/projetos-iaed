@@ -22,8 +22,7 @@ int add_airport() {
 	char city[MAX_CITY_NAME_LENGTH];
 
 	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
-
-	if (has_lowercase(airport_id)) {
+	if (!isvalid_airport_id(airport_id)) {
 		printf(INVALID_AIRPORT_ID);
 		return ERROR;
 	}
@@ -36,7 +35,7 @@ int add_airport() {
 		return ERROR;
 	}
 
-	ins_index = -(ins_index + 1);
+	ins_index = -(ins_index + 1); /* Convert index to positive */
 	for (n = system.airports_count; n > ins_index; n--) {
 		system.airports[n] = system.airports[n - 1];
 	}
@@ -67,11 +66,9 @@ int list_airports() {
 		}
 		print_airport(&system.airports[i]);
 	}
-	if (!has_argument) {
-		for (i = 0; i < system.airports_count; i++) {
+	if (!has_argument)
+		for (i = 0; i < system.airports_count; i++)
 			print_airport(&system.airports[i]);
-		}
-	}
 	return 0;
 }
 
@@ -81,37 +78,14 @@ int list_airports() {
 
 /* Adds a new flight to the system */
 int add_flight() {
-	char flight_id[FLIGHT_ID_LENGTH];
-	char departure_id[AIRPORT_ID_LENGTH];
-	char arrival_id[AIRPORT_ID_LENGTH];
-	Airport* departure;
-	Airport* arrival;
-	Date departure_date;
-	Time departure_time, duration;
-	int capacity;
-	Flight flight;
+	Flight* new_flight;
 
-	scanf("%s %s %s", flight_id, departure_id, arrival_id);
-	read_date(&departure_date);
-	read_time(&departure_time);
-	read_time(&duration);
-	scanf("%d", &capacity);
+	new_flight = &system.flights[system.flights_count];
+	if (read_flight(new_flight) == ERROR) return ERROR;
+	calculate_arrival(new_flight);
 
-	if (has_error_flight(flight_id, &departure_date, arrival_id, departure_id,
-						 duration, capacity)) {
-		return ERROR;
-	}
-
-	arrival = &system.airports[get_airport(arrival_id)];
-	departure = &system.airports[get_airport(departure_id)];
-
-	init_flight(&flight, flight_id, departure, arrival, &departure_date,
-				&departure_time, &duration, capacity);
-	calculate_arrival(&flight);
-
-	system.flights[system.flights_count] = flight;
-	system.sorted_flights_arr[system.flights_count] = &system.flights[system.flights_count];
-	system.sorted_flights_dep[system.flights_count] = &system.flights[system.flights_count];
+	system.sorted_flights_arr[system.flights_count] = new_flight;
+	system.sorted_flights_dep[system.flights_count] = new_flight;
 	system.flights_count++;
 	system.is_departures_sorted = 0;
 	system.is_arrivals_sorted = 0;
@@ -142,9 +116,11 @@ int list_flights(char mode) {
 		printf(NO_SUCH_AIRPORT, airport_id);
 		return ERROR;
 	}
+	/* REPEATED CODE HERE */
 	for (i = 0; i < system.flights_count; i++) {
-		if (mode == 'c' && strcmp((flight = system.sorted_flights_arr[i])->arrival->id,
-								  airport_id) == 0) {
+		if (mode == 'c' &&
+			strcmp((flight = system.sorted_flights_arr[i])->arrival->id,
+				   airport_id) == 0) {
 			print_flight(flight->id, flight->departure->id,
 						 &flight->arrival_date, &flight->arrival_time);
 		}
@@ -165,13 +141,9 @@ int list_flights(char mode) {
 /* Changes the system date */
 int change_date() {
 	Date new_date;
-	Date future_date;
 
 	read_date(&new_date);
-	future_date = system.date;
-	future_date.year++;
-	if (compare_date(&new_date, &system.date) < 0 ||
-		compare_date(&new_date, &future_date) > 0) {
+	if (!isvalid_date(&new_date)) {
 		printf(INVALID_DATE);
 		return ERROR;
 	}

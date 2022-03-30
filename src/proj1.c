@@ -31,29 +31,29 @@ int main() {
 int cmd_triage() {
 	char c = getchar();
 	switch (c) {
-		case 'q': /* Ends the program */
+		case QUIT_CMD: /* Ends the program */
 			return 0;
-		case 'a':
+		case ADD_AIRPORT_CMD:
 			add_airport();
 			break;
-		case 'l':
+		case LIST_AIRPORTS_CMD:
 			list_airports();
 			break;
-		case 'v':
+		case ADD_FLIGHT_CMD:
 			if (getchar() == '\n')
 				list_all_flights();
 			else
 				add_flight();
 			break;
-		case 'p':
+		case LIST_DEPARTURES_CMD:
 			sort_departures();
 			list_flights('p');
 			break;
-		case 'c':
+		case LIST_ARRIVALS_CMD:
 			sort_arrivals();
 			list_flights('c');
 			break;
-		case 't':
+		case CHANGE_DATE_CMD:
 			change_date();
 			break;
 		default: /* ignores unknown commands */

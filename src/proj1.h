@@ -5,7 +5,7 @@
  */
 
 /*----------------------
- |  CONSTANTS & MACROS  |
+ |  CONSTANTS & STRINGS  |
  -----------------------*/
 
 #define TRUE 1
@@ -34,6 +34,15 @@
 static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 										   31, 31, 30, 31, 30, 31};
 
+/* COMMANDS */
+#define QUIT_CMD 'q'
+#define ADD_AIRPORT_CMD 'a'
+#define LIST_AIRPORTS_CMD 'l'
+#define ADD_FLIGHT_CMD 'v'
+#define LIST_DEPARTURES_CMD 'p'
+#define LIST_ARRIVALS_CMD 'c'
+#define CHANGE_DATE_CMD 't'
+
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
 #define INVALID_DATE "invalid date\n"
@@ -54,6 +63,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 
 /* ARGUMENT FORMATS */
 #define IN_AIRPORT_FORMAT "%s %s %[^\n]"
+#define IN_FLIGHT_FORMAT "%s %s %s"
 #define IN_DATE_FORMAT "%d-%d-%d"
 #define OUT_DATE_FORMAT "%02d-%02d-%d"
 #define IN_TIME_FORMAT "%d:%d"
@@ -121,7 +131,7 @@ extern System system;
  | FUNCTION PROTOTYPES	|
  -----------------------*/
 
-/* main.c */
+/* proj1.c */
 int cmd_triage();
 
 /* commands.c */
@@ -137,7 +147,7 @@ int get_airport(char id[]);
 int get_flight(char id[], Date* date);
 int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
-int has_lowercase(char* str);
+int isvalid_airport_id(char* str);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -150,10 +160,12 @@ int compare_date(Date* date1, Date* date2);
 int compare_time(Time* time1, Time* time2);
 int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
 void calculate_arrival(Flight* flight);
+int isvalid_date(Date* date);
 
 Date increment_date(Date date);
 Time sum_time(Time* time, Time* duration);
 
+int read_flight(Flight* new_flight);
 void read_date(Date* date);
 void read_time(Time* time);
 
