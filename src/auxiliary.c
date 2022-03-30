@@ -17,7 +17,7 @@ int get_airport(char id[]) {
 	right = airports_count - 1;
 	middle = (left + right) / 2;
 	while (left <= right) {
-		cmp = strcmp(sorted_airports[middle]->id, id);
+		cmp = strcmp(airports[middle].id, id);
 		if (cmp < 0)
 			left = middle + 1;
 		else if (cmp == 0) {

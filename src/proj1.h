@@ -96,9 +96,8 @@ typedef struct Flight {
 /* Number of airports and flights added */
 extern int airports_count, flights_count;
 
-/* Airport arrays */
+/* Airport array sorted by ID */
 extern Airport airports[MAX_AIRPORTS];
-extern Airport* sorted_airports[MAX_AIRPORTS]; /* Sorted by ID */
 
 /* Flight arrays */
 extern Flight flights[MAX_FLIGHTS];

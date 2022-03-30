@@ -21,7 +21,6 @@ int add_airport() {
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
-	Airport airport;
 
 	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
 
@@ -41,16 +40,13 @@ int add_airport() {
 		return ERROR;
 	}
 
-	init_airport(&airport, airport_id, country, city);
-	airports[airports_count] = airport;
-
 	ins_index = -(ins_index + 1);
 	n = airports_count;
 	while (n > ins_index) {
-		sorted_airports[n] = sorted_airports[n - 1];
+		airports[n] = airports[n - 1];
 		n--;
 	}
-	sorted_airports[ins_index] = &airports[airports_count];
+	init_airport(&airports[ins_index], airport_id, country, city);
 	airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
@@ -75,11 +71,11 @@ int list_airports() {
 			printf(NO_SUCH_AIRPORT, airportID);
 			continue;
 		}
-		print_airport(sorted_airports[i]);
+		print_airport(&airports[i]);
 	}
 	if (!has_argument) {
 		for (i = 0; i < airports_count; i++) {
-			print_airport(sorted_airports[i]);
+			print_airport(&airports[i]);
 		}
 	}
 	return 0;
@@ -112,8 +108,8 @@ int add_flight() {
 		return ERROR;
 	}
 
-	arrival = sorted_airports[get_airport(arrival_id)];
-	departure = sorted_airports[get_airport(departure_id)];
+	arrival = &airports[get_airport(arrival_id)];
+	departure = &airports[get_airport(departure_id)];
 
 	init_flight(&flight, flight_id, departure, arrival, &departure_date,
 				&departure_time, &duration, capacity);
@@ -140,7 +136,8 @@ void list_all_flights() {
  |  - P AND C COMMAND
  -----------------------*/
 
-/* Lists arrival (mode a) or departure (mode p) flights in the airport provided */
+/* Lists arrival (mode a) or departure (mode p) flights in the airport provided
+ */
 int list_flights(char mode) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
