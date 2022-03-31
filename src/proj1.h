@@ -98,11 +98,11 @@ typedef struct {
 	char id[FLIGHT_ID_LENGTH];
 	Airport* departure;
 	Airport* arrival;
-	Date departure_date;
-	Time departure_time;
+	Date dep_date;
+	Time dep_time;
 	Time duration;
-	Date arrival_date;
-	Time arrival_time;
+	Date arr_date;
+	Time arr_time;
 	int capacity;
 } Flight;
 
@@ -119,11 +119,11 @@ typedef struct {
 
 	/* Flight arrays */
 	Flight flights[MAX_FLIGHTS];
-	Flight* sorted_flights_dep[MAX_FLIGHTS]; /* Sorted by departure date */
-	Flight* sorted_flights_arr[MAX_FLIGHTS]; /* Sorted by arrival date */
+	Flight* dep_flights[MAX_FLIGHTS]; /* Sorted by departure date */
+	Flight* arr_flights[MAX_FLIGHTS]; /* Sorted by arrival date */
 
-	/* Boolean to avoid sorting if no changes were made to the arrays */
-	int is_departures_sorted, is_arrivals_sorted;
+	/* Flag to avoid sorting if no changes were made to the arrays */
+	int is_dep_sorted, is_arr_sorted;
 
 	/* Current system date */
 	Date date;
@@ -146,8 +146,8 @@ void list_all_flights();
 void list_departures();
 void list_arrivals();
 void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
-				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
-				 Time* (*time_key)(Flight*));
+				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
+				  Time* (*time_key)(Flight*));
 void change_date();
 
 /* auxiliary.c */
@@ -161,8 +161,7 @@ void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
 void init_airport(Airport* airport, char* id, char* country, char* city);
 void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
-				 Date* departure_date, Time* departure_time, Time* duration,
-				 int capacity);
+				 Date* dep_date, Time* dep_time, Time* duration, int capacity);
 
 int cmp_date(Date* date1, Date* date2);
 int cmp_time(Time* time1, Time* time2);
@@ -183,7 +182,7 @@ void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
 
-int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
+int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
 
 void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),

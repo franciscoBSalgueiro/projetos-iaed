@@ -20,7 +20,10 @@ void add_airport() {
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
+
 	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
+
+	/* Error checks */
 	if (!isvalid_airport_id(airport_id)) {
 		printf(INVALID_AIRPORT_ID);
 		return;
@@ -33,11 +36,16 @@ void add_airport() {
 		printf(DUPLICATE_AIRPORT);
 		return;
 	}
+
 	ins_index = -(ins_index + 1); /* Convert index to positive */
+
+	/* Inserts the airport in the correct position alphabetically */
 	memmove(&system.airports[ins_index + 1], &system.airports[ins_index],
 			(system.airports_count - ins_index) * sizeof(Airport));
 	init_airport(&system.airports[ins_index], airport_id, country, city);
+
 	system.airports_count++;
+
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
 }
 
@@ -78,11 +86,13 @@ void add_flight() {
 	if (read_flight(new_flight) == ERROR) return;
 	calculate_arrival(new_flight);
 
-	system.sorted_flights_arr[system.flights_count] = new_flight;
-	system.sorted_flights_dep[system.flights_count] = new_flight;
+	system.arr_flights[system.flights_count] = new_flight;
+	system.dep_flights[system.flights_count] = new_flight;
 	system.flights_count++;
-	system.is_departures_sorted = 0;
-	system.is_arrivals_sorted = 0;
+
+	/* Resets flags as the array may no longer be sorted */
+	system.is_dep_sorted = FALSE;
+	system.is_arr_sorted = FALSE;
 }
 
 /* Lists all flights in the system */
@@ -99,24 +109,24 @@ void list_all_flights() {
 
 /* Lists all flights departing from the specified airport */
 void list_departures() {
-	insertion_sort(system.is_departures_sorted, system.sorted_flights_dep,
-				   &dep_date_key, &dep_time_key);
-	list_flights(system.sorted_flights_dep, &dep_id_key, &arr_id_key,
-				 &dep_date_key, &dep_time_key);
+	insertion_sort(system.is_dep_sorted, system.dep_flights, &dep_date_key,
+				   &dep_time_key);
+	list_flights(system.dep_flights, &dep_id_key, &arr_id_key, &dep_date_key,
+				 &dep_time_key);
 }
 
 /* Lists all flights arriving to the specified airport */
 void list_arrivals() {
-	insertion_sort(system.is_arrivals_sorted, system.sorted_flights_arr,
-				   &arr_date_key, &arr_time_key);
-	list_flights(system.sorted_flights_arr, &arr_id_key, dep_id_key,
-				 &arr_date_key, &arr_time_key);
+	insertion_sort(system.is_arr_sorted, system.arr_flights, &arr_date_key,
+				   &arr_time_key);
+	list_flights(system.arr_flights, &arr_id_key, dep_id_key, &arr_date_key,
+				 &arr_time_key);
 }
 
 /* Auxiliary function for listing flights from specified airport */
-void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
-				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
-				 Time* (*time_key)(Flight*)) {
+void list_flights(Flight* array[], char* (*airport_key_in)(Flight*),
+				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
+				  Time* (*time_key)(Flight*)) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
 
@@ -127,9 +137,10 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 	}
 
 	for (i = 0; i < system.flights_count; i++) {
-		if (strcmp(airport_key_in(arr[i]), airport_id) == 0) {
-			print_flight(arr[i]->id, airport_key_out(arr[i]), date_key(arr[i]),
-						 time_key(arr[i]));
+		/* Checks for flights from the specified airport */
+		if (strcmp(airport_key_in(array[i]), airport_id) == 0) {
+			print_flight(array[i]->id, airport_key_out(array[i]),
+						 date_key(array[i]), time_key(array[i]));
 		}
 	}
 }

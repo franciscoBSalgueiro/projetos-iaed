@@ -16,8 +16,8 @@ int main() {
 	/* System initialization with initial values */
 	system.airports_count = 0;
 	system.flights_count = 0;
-	system.is_departures_sorted = 0;
-	system.is_arrivals_sorted = 0;
+	system.is_dep_sorted = FALSE;
+	system.is_arr_sorted = FALSE;
 	init_date(&system.date, INITIAL_DATE);
 
 	/* Continues until the user enters the command 'q' */
@@ -29,13 +29,12 @@ int main() {
 
 /* Reads the command prefix and calls the respective function */
 int cmd_triage() {
-	char c = getchar();
-	switch (c) {
-		case QUIT_CMD: return 0;
+	switch (getchar()) {
+		case QUIT_CMD: return 0; /* ends the program */
 		case ADD_AIRPORT_CMD: add_airport(); break;
 		case LIST_AIRPORTS_CMD: list_airports(); break;
 		case ADD_FLIGHT_CMD: 
-			if (getchar() == '\n')
+			if (getchar() == '\n') /* No argument given */
 				list_all_flights();
 			else
 				add_flight();
@@ -43,7 +42,7 @@ int cmd_triage() {
 		case LIST_DEPARTURES_CMD: list_departures(); break;
 		case LIST_ARRIVALS_CMD: list_arrivals(); break;
 		case CHANGE_DATE_CMD: change_date(); break;
-		default: break;
+		default: break; /* ignore invalid commands */
 	}
-	return 1;
+	return 1; /* waits for next command */
 }
