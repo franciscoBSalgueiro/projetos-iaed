@@ -38,7 +38,7 @@ int get_flight(char id[], Date* date) {
 	int i;
 	for (i = 0; i < system.flights_count; i++)
 		if (strcmp(system.flights[i].id, id) == 0 &&
-			compare_date(&system.flights->departure_date, date) == 0) {
+			cmp_date(&system.flights->departure_date, date) == 0) {
 			return i;
 		}
 	return -1;
@@ -113,7 +113,7 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 
 /* Returns -1 if date1 happens before date2, 0 if the dates are equal and 1 if
  * date1 happens after date2 */
-int compare_date(Date* date1, Date* date2) {
+int cmp_date(Date* date1, Date* date2) {
 	if (date1->year < date2->year) return -1;
 	if (date1->year > date2->year) return 1;
 	if (date1->month < date2->month) return -1;
@@ -125,7 +125,7 @@ int compare_date(Date* date1, Date* date2) {
 
 /* Returns -1 if time1 happens before time2, 0 if the dates are equal and 1 if
  * time1 happens after time2 */
-int compare_time(Time* time1, Time* time2) {
+int cmp_time(Time* time1, Time* time2) {
 	if (time1->hours < time2->hours) return -1;
 	if (time1->hours > time2->hours) return 1;
 	if (time1->minutes < time2->minutes) return -1;
@@ -134,11 +134,11 @@ int compare_time(Time* time1, Time* time2) {
 }
 
 /* Combines the two previous functions */
-int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
+int cmp_date_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 	int d, t;
-	if ((d = compare_date(date1, date2)) < 0) return -1;
+	if ((d = cmp_date(date1, date2)) < 0) return -1;
 	if (d > 0) return 1;
-	if ((t = compare_time(time1, time2)) < 0) return -1;
+	if ((t = cmp_time(time1, time2)) < 0) return -1;
 	if (t > 0) return 1;
 	return 0;
 }
@@ -189,8 +189,7 @@ int isvalid_date(Date* date) {
 	Date future_date;
 	future_date = system.date;
 	future_date.year++;
-	if (compare_date(date, &system.date) < 0 ||
-		compare_date(date, &future_date) > 0) {
+	if (cmp_date(date, &system.date) < 0 || cmp_date(date, &future_date) > 0) {
 		return FALSE;
 	}
 	return TRUE;
@@ -208,8 +207,7 @@ int read_flight(Flight* new_flight) {
 	Date dep_date;
 	Time dep_time, duration;
 	int capacity;
-	Airport* departure;
-	Airport* arrival;
+	Airport *departure, *arrival;
 
 	scanf(IN_FLIGHT_FORMAT, flight_id, departure_id, arrival_id);
 	read_date(&dep_date);
@@ -220,10 +218,8 @@ int read_flight(Flight* new_flight) {
 	if (has_error_flight(flight_id, &dep_date, arrival_id, departure_id,
 						 duration, capacity))
 		return ERROR;
-
 	departure = &system.airports[get_airport(departure_id)];
 	arrival = &system.airports[get_airport(arrival_id)];
-
 	init_flight(new_flight, flight_id, departure, arrival, &dep_date, &dep_time,
 				&duration, capacity);
 	return 0;
@@ -293,37 +289,23 @@ void print_time(Time* time) {
 int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity) {
 	int t;
-	if (!isvalid_flight_id(flight_id)) {
-		printf(INVALID_FLIGHT);
-		return TRUE;
-	}
-	if (get_flight(flight_id, departure_date) >= 0) {
-		printf(FLIGHT_ALREADY_EXISTS);
-		return TRUE;
-	}
-	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0) {
-		printf(NO_SUCH_AIRPORT, t < 0 ? departure_id : arrival_id);
-		return TRUE;
-	}
-	if (system.flights_count == MAX_FLIGHTS) {
-		printf(TOO_MANY_FLIGHTS);
-		return TRUE;
-	}
-	if (!isvalid_date(departure_date)) {
-		printf(INVALID_DATE);
-		return TRUE;
-	}
-	if (duration.hours > MAX_DURATION ||
-		(duration.hours == MAX_DURATION && duration.minutes > 0)) {
-		printf(INVALID_DURATION);
-		return TRUE;
-	}
-	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY) {
-		printf(INVALID_CAPACITY);
-		return TRUE;
-	}
+	if (!isvalid_flight_id(flight_id))
+		return printf(INVALID_FLIGHT);
+	if (get_flight(flight_id, departure_date) >= 0)
+		return printf(FLIGHT_ALREADY_EXISTS);
+	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0)
+		return printf(NO_SUCH_AIRPORT, t < 0 ? departure_id : arrival_id);
+	if (system.flights_count == MAX_FLIGHTS)
+		return printf(TOO_MANY_FLIGHTS);
+	if (!isvalid_date(departure_date))
+		return printf(INVALID_DATE);
+	if (duration.hours > MAX_DURATION || (duration.hours == MAX_DURATION && duration.minutes > 0))
+		return printf(INVALID_DURATION);
+	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY)
+		return printf(INVALID_CAPACITY);
 	return FALSE;
 }
+
 
 /*----------------------
  |   SORTING FUNCTIONS	|
@@ -340,9 +322,9 @@ void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 
 	for (i = 1; i < system.flights_count; i++) {
 		temp = arr[i];
-		for (j = i - 1; j >= 0 && compare_date_and_time(
-									  date_key(arr[j]), date_key(temp),
-									  time_key(arr[j]), time_key(temp)) > 0;
+		for (j = i - 1;
+			 j >= 0 && cmp_date_time(date_key(arr[j]), date_key(temp),
+									 time_key(arr[j]), time_key(temp)) > 0;
 			 j--) {
 			arr[j + 1] = arr[j];
 		}

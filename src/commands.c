@@ -15,35 +15,30 @@
  -----------------------*/
 
 /* Adds a new airport to the system */
-int add_airport() {
-	int n, ins_index;
+void add_airport() {
+	int ins_index;
 	char airport_id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
-
 	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
 	if (!isvalid_airport_id(airport_id)) {
 		printf(INVALID_AIRPORT_ID);
-		return ERROR;
+		return;
 	}
 	if (system.airports_count == MAX_AIRPORTS) {
 		printf(TOO_MANY_AIPORTS);
-		return ERROR;
+		return;
 	}
 	if ((ins_index = get_airport(airport_id)) >= 0) {
 		printf(DUPLICATE_AIRPORT);
-		return ERROR;
+		return;
 	}
-
 	ins_index = -(ins_index + 1); /* Convert index to positive */
-	for (n = system.airports_count; n > ins_index; n--) {
-		system.airports[n] = system.airports[n - 1];
-	}
+	memmove(&system.airports[ins_index + 1], &system.airports[ins_index],
+			(system.airports_count - ins_index) * sizeof(Airport));
 	init_airport(&system.airports[ins_index], airport_id, country, city);
 	system.airports_count++;
-
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
-	return 0;
 }
 
 /*----------------------
@@ -51,13 +46,13 @@ int add_airport() {
  -----------------------*/
 
 /* Lists all airports in the system */
-int list_airports() {
+void list_airports() {
 	int i, has_argument;
 	char airportID[AIRPORT_ID_LENGTH];
 
-	has_argument = 0;
+	has_argument = FALSE;
 	while (getchar() != '\n') {
-		has_argument = 1;
+		has_argument = TRUE;
 		scanf("%s", airportID);
 		i = get_airport(airportID);
 		if (i < 0) {
@@ -66,10 +61,9 @@ int list_airports() {
 		}
 		print_airport(&system.airports[i]);
 	}
-	if (!has_argument)
+	if (!has_argument) /* Only prints all airports if no argument is given */
 		for (i = 0; i < system.airports_count; i++)
 			print_airport(&system.airports[i]);
-	return 0;
 }
 
 /*----------------------
@@ -77,11 +71,11 @@ int list_airports() {
  -----------------------*/
 
 /* Adds a new flight to the system */
-int add_flight() {
+void add_flight() {
 	Flight* new_flight;
 
 	new_flight = &system.flights[system.flights_count];
-	if (read_flight(new_flight) == ERROR) return ERROR;
+	if (read_flight(new_flight) == ERROR) return;
 	calculate_arrival(new_flight);
 
 	system.sorted_flights_arr[system.flights_count] = new_flight;
@@ -89,7 +83,6 @@ int add_flight() {
 	system.flights_count++;
 	system.is_departures_sorted = 0;
 	system.is_arrivals_sorted = 0;
-	return 0;
 }
 
 /* Lists all flights in the system */
@@ -121,7 +114,7 @@ void list_arrivals() {
 }
 
 /* Auxiliary function for listing flights from specified airport */
-int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
+void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				 Time* (*time_key)(Flight*)) {
 	int i;
@@ -130,7 +123,7 @@ int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 	scanf("%s", airport_id);
 	if (get_airport(airport_id) < 0) {
 		printf(NO_SUCH_AIRPORT, airport_id);
-		return ERROR;
+		return;
 	}
 
 	for (i = 0; i < system.flights_count; i++) {
@@ -139,7 +132,6 @@ int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 						 time_key(arr[i]));
 		}
 	}
-	return 0;
 }
 
 /*----------------------
@@ -147,18 +139,16 @@ int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
  -----------------------*/
 
 /* Changes the system date */
-int change_date() {
+void change_date() {
 	Date new_date;
 
 	read_date(&new_date);
 	if (!isvalid_date(&new_date)) {
 		printf(INVALID_DATE);
-		return ERROR;
+		return;
 	}
 	system.date = new_date;
 
 	print_date(&system.date);
 	putchar('\n');
-
-	return 0;
 }

@@ -73,23 +73,27 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
+/* Airport struct */
 typedef struct {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
 } Airport;
 
+/* Date struct */
 typedef struct {
 	int day;
 	int month;
 	int year;
 } Date;
 
+/* Time struct */
 typedef struct {
 	int hours;
 	int minutes;
 } Time;
 
+/* Flight struct */
 typedef struct {
 	char id[FLIGHT_ID_LENGTH];
 	Airport* departure;
@@ -135,16 +139,16 @@ extern System system;
 int cmd_triage();
 
 /* commands.c */
-int add_airport();
-int list_airports();
-int add_flight();
+void add_airport();
+void list_airports();
+void add_flight();
 void list_all_flights();
 void list_departures();
 void list_arrivals();
-int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
+void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				 Time* (*time_key)(Flight*));
-int change_date();
+void change_date();
 
 /* auxiliary.c */
 int get_airport(char id[]);
@@ -160,9 +164,9 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 				 Date* departure_date, Time* departure_time, Time* duration,
 				 int capacity);
 
-int compare_date(Date* date1, Date* date2);
-int compare_time(Time* time1, Time* time2);
-int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2);
+int cmp_date(Date* date1, Date* date2);
+int cmp_time(Time* time1, Time* time2);
+int cmp_date_time(Date* date1, Date* date2, Time* time1, Time* time2);
 void calculate_arrival(Flight* flight);
 int isvalid_date(Date* date);
 
