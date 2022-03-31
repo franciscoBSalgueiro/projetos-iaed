@@ -120,7 +120,7 @@ void list_arrivals() {
 				 &arr_date_key, &arr_time_key);
 }
 
-/* Auxiliary function for listing flights */
+/* Auxiliary function for listing flights from specified airport */
 int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				 Time* (*time_key)(Flight*)) {

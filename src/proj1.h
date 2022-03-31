@@ -182,12 +182,10 @@ void print_time(Time* time);
 int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
 
-
 void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 					Time* (*time_key)(Flight*));
 void sort_arrivals();
 void sort_departures();
-
 
 char* dep_id_key(Flight* flight);
 char* arr_id_key(Flight* flight);

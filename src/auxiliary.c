@@ -197,9 +197,10 @@ int isvalid_date(Date* date) {
 }
 
 /*----------------------
- |    READ FUNCTIONS		|
+ |    READ FUNCTIONS	|
  -----------------------*/
 
+/* Reads all the flight data from stdin and puts it in new_flight */
 int read_flight(Flight* new_flight) {
 	char flight_id[FLIGHT_ID_LENGTH];
 	char departure_id[AIRPORT_ID_LENGTH];
@@ -349,7 +350,9 @@ void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 	}
 }
 
-/* KEY FUNCTIONS */
+/*----------------------
+ |     KEY FUNCTIONS	|
+ -----------------------*/
 
 char* dep_id_key(Flight* flight) { return flight->departure->id; }
 char* arr_id_key(Flight* flight) { return flight->arrival->id; }
