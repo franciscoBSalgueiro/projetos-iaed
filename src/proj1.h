@@ -139,7 +139,11 @@ int add_airport();
 int list_airports();
 int add_flight();
 void list_all_flights();
-int list_flights(char mode);
+void list_departures();
+void list_arrivals();
+int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
+				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
+				 Time* (*time_key)(Flight*));
 int change_date();
 
 /* auxiliary.c */
@@ -178,5 +182,16 @@ void print_time(Time* time);
 int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
 
+
+void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
+					Time* (*time_key)(Flight*));
 void sort_arrivals();
 void sort_departures();
+
+
+char* dep_id_key(Flight* flight);
+char* arr_id_key(Flight* flight);
+Date* dep_date_key(Flight* flight);
+Date* arr_date_key(Flight* flight);
+Time* dep_time_key(Flight* flight);
+Time* arr_time_key(Flight* flight);

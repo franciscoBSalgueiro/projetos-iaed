@@ -46,12 +46,10 @@ int cmd_triage() {
 				add_flight();
 			break;
 		case LIST_DEPARTURES_CMD:
-			sort_departures();
-			list_flights('p');
+			list_departures();
 			break;
 		case LIST_ARRIVALS_CMD:
-			sort_arrivals();
-			list_flights('c');
+			list_arrivals();
 			break;
 		case CHANGE_DATE_CMD:
 			change_date();

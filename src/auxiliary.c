@@ -71,7 +71,7 @@ int isvalid_airport_id(char* id) {
 }
 
 /*--------------------------
- |  INTIALIAZING FUNTIONS	|
+ |  INTIALIAZING FUNCTIONS	|
  ---------------------------*/
 
 /* Initializes values for the Time struct */
@@ -108,7 +108,7 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 }
 
 /*----------------------
- |  COMPARISON FUNTIONS	|
+ |  COMPARISON FUNCTIONS	|
  -----------------------*/
 
 /* Returns -1 if date1 happens before date2, 0 if the dates are equal and 1 if
@@ -144,7 +144,7 @@ int compare_date_and_time(Date* date1, Date* date2, Time* time1, Time* time2) {
 }
 
 /*--------------------------
- |   DATE & TIME FUNTIONS	|
+ |   DATE & TIME FUNCTIONS	|
  ---------------------------*/
 
 /* Return date incremented by one day */
@@ -197,7 +197,7 @@ int isvalid_date(Date* date) {
 }
 
 /*----------------------
- |    READ FUNTIONS		|
+ |    READ FUNCTIONS		|
  -----------------------*/
 
 int read_flight(Flight* new_flight) {
@@ -245,7 +245,7 @@ void read_time(Time* time) {
 }
 
 /*----------------------
- |  PRINT FUNTIONS		|
+ |  PRINT FUNCTIONS		|
  -----------------------*/
 
 /* Prints airport in formatted form */
@@ -285,7 +285,7 @@ void print_time(Time* time) {
 }
 
 /*----------------------
- |    ERROR FUNTIONS	|
+ |    ERROR FUNCTIONS	|
  -----------------------*/
 
 /* Handles all errors for add_flight */
@@ -325,53 +325,35 @@ int has_error_flight(char* flight_id, Date* departure_date, char* arrival_id,
 }
 
 /*----------------------
- |   SORTING FUNTIONS	|
+ |   SORTING FUNCTIONS	|
  -----------------------*/
 
-/* REPEATED CODE HERE */
-
-/* Insertion sorts flights by arrival date and time */
-void sort_arrivals() {
+/* Sorts flights by departure or arrival date and time */
+void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
+					Time* (*time_key)(Flight*)) {
 	int i, j;
 	Flight* temp;
 
-	if (system.is_arrivals_sorted) return;
-	system.is_arrivals_sorted = 1;
+	if (is_sorted) return;
+	is_sorted = 1;
 
 	for (i = 1; i < system.flights_count; i++) {
-		temp = system.sorted_flights_arr[i];
-		for (j = i - 1;
-			 j >= 0 &&
-			 compare_date_and_time(&system.sorted_flights_arr[j]->arrival_date,
-								   &temp->arrival_date,
-								   &system.sorted_flights_arr[j]->arrival_time,
-								   &temp->arrival_time) > 0;
+		temp = arr[i];
+		for (j = i - 1; j >= 0 && compare_date_and_time(
+									  date_key(arr[j]), date_key(temp),
+									  time_key(arr[j]), time_key(temp)) > 0;
 			 j--) {
-			system.sorted_flights_arr[j + 1] = system.sorted_flights_arr[j];
+			arr[j + 1] = arr[j];
 		}
-		system.sorted_flights_arr[j + 1] = temp;
+		arr[j + 1] = temp;
 	}
 }
 
-/* Insertion sorts flights by departure date and time */
-void sort_departures() {
-	int i, j;
-	Flight* temp;
+/* KEY FUNCTIONS */
 
-	if (system.is_departures_sorted) return;
-	system.is_departures_sorted = 1;
-
-	for (i = 1; i < system.flights_count; i++) {
-		temp = system.sorted_flights_dep[i];
-		for (j = i - 1;
-			 j >= 0 && compare_date_and_time(
-						   &system.sorted_flights_dep[j]->departure_date,
-						   &temp->departure_date,
-						   &system.sorted_flights_dep[j]->departure_time,
-						   &temp->departure_time) > 0;
-			 j--) {
-			system.sorted_flights_dep[j + 1] = system.sorted_flights_dep[j];
-		}
-		system.sorted_flights_dep[j + 1] = temp;
-	}
-}
+char* dep_id_key(Flight* flight) { return flight->departure->id; }
+char* arr_id_key(Flight* flight) { return flight->arrival->id; }
+Date* dep_date_key(Flight* flight) { return &flight->departure_date; }
+Date* arr_date_key(Flight* flight) { return &flight->arrival_date; }
+Time* dep_time_key(Flight* flight) { return &flight->departure_time; }
+Time* arr_time_key(Flight* flight) { return &flight->arrival_time; }

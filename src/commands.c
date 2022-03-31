@@ -101,34 +101,42 @@ void list_all_flights() {
 }
 
 /*----------------------
- |  - P AND C COMMAND
+ |  - P AND C COMMANDS  |
  -----------------------*/
 
-/* Lists arrival (mode a) or departure (mode p) flights in the airport provided
- */
-int list_flights(char mode) {
+/* Lists all flights departing from the specified airport */
+void list_departures() {
+	insertion_sort(system.is_departures_sorted, system.sorted_flights_dep,
+				   &dep_date_key, &dep_time_key);
+	list_flights(system.sorted_flights_dep, &dep_id_key, &arr_id_key,
+				 &dep_date_key, &dep_time_key);
+}
+
+/* Lists all flights arriving to the specified airport */
+void list_arrivals() {
+	insertion_sort(system.is_arrivals_sorted, system.sorted_flights_arr,
+				   &arr_date_key, &arr_time_key);
+	list_flights(system.sorted_flights_arr, &arr_id_key, dep_id_key,
+				 &arr_date_key, &arr_time_key);
+}
+
+/* Auxiliary function for listing flights */
+int list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
+				 char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
+				 Time* (*time_key)(Flight*)) {
 	int i;
 	char airport_id[AIRPORT_ID_LENGTH];
-	Flight* flight;
 
 	scanf("%s", airport_id);
 	if (get_airport(airport_id) < 0) {
 		printf(NO_SUCH_AIRPORT, airport_id);
 		return ERROR;
 	}
-	/* REPEATED CODE HERE */
+
 	for (i = 0; i < system.flights_count; i++) {
-		if (mode == 'c' &&
-			strcmp((flight = system.sorted_flights_arr[i])->arrival->id,
-				   airport_id) == 0) {
-			print_flight(flight->id, flight->departure->id,
-						 &flight->arrival_date, &flight->arrival_time);
-		}
-		if (mode == 'p' &&
-			strcmp((flight = system.sorted_flights_dep[i])->departure->id,
-				   airport_id) == 0) {
-			print_flight(flight->id, flight->arrival->id,
-						 &flight->departure_date, &flight->departure_time);
+		if (strcmp(airport_key_in(arr[i]), airport_id) == 0) {
+			print_flight(arr[i]->id, airport_key_out(arr[i]), date_key(arr[i]),
+						 time_key(arr[i]));
 		}
 	}
 	return 0;
