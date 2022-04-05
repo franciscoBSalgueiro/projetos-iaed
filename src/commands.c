@@ -4,7 +4,6 @@
  * Description: Functions for handling commands
  */
 
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -162,4 +161,24 @@ void change_date() {
 
 	print_date(&system.date);
 	putchar('\n');
+}
+
+/*----------------------
+ |  -T COMMAND
+ -----------------------*/
+
+ void list_reserves() {
+	 return;
+ }
+
+ void add_reserve() {
+	 return;
+ }
+
+ /*----------------------
+  |  -E COMMAND
+  -----------------------*/
+
+void delete_reserve() {
+	return;
 }

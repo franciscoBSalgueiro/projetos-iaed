@@ -42,6 +42,13 @@ int cmd_triage() {
 		case LIST_DEPARTURES_CMD: list_departures(); break;
 		case LIST_ARRIVALS_CMD: list_arrivals(); break;
 		case CHANGE_DATE_CMD: change_date(); break;
+		case LIST_RESERVES_CMD:
+			if (getchar() == '\n') /* No argument given */
+				list_reserves();
+			else
+				add_reserve();
+			break;
+		case DELETE_RESERVE_CMD: delete_reserve(); break;
 		default: break; /* ignore invalid commands */
 	}
 	return 1; /* waits for next command */

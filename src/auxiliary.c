@@ -4,7 +4,6 @@
  * Description: Auxiliary functions
  */
 
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -56,9 +55,9 @@ int get_num_flights(char* id) {
 int isvalid_flight_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
-	if (l < 3 || l > 6 || !isupper(id[0]) || !isupper(id[1])) return FALSE;
+	if (l < 3 || l > 6 || !is_upper(id[0]) || !is_upper(id[1])) return FALSE;
 	for (i = 2; i < l; i++)
-		if (!isdigit(id[i])) return FALSE;
+		if (!is_digit(id[i])) return FALSE;
 	return TRUE;
 }
 
@@ -66,7 +65,7 @@ int isvalid_flight_id(char* id) {
 int isvalid_airport_id(char* id) {
 	unsigned int i, l = strlen(id);
 	for (i = 0; i < l; i++)
-		if (islower(id[i])) return FALSE;
+		if (is_lower(id[i])) return FALSE;
 	return TRUE;
 }
 
@@ -355,3 +354,11 @@ Date* dep_date_key(Flight* flight) { return &flight->dep_date; }
 Date* arr_date_key(Flight* flight) { return &flight->arr_date; }
 Time* dep_time_key(Flight* flight) { return &flight->dep_time; }
 Time* arr_time_key(Flight* flight) { return &flight->arr_time; }
+
+/*----------------------
+ |       C TYPES      	|
+ -----------------------*/
+
+ int is_lower(char c) { return c >= 'a' && c <= 'z'; }
+ int is_upper(char c) { return c >= 'A' && c <= 'Z'; }
+ int is_digit(char c) { return c >= '0' && c <= '9'; }

@@ -42,6 +42,8 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define LIST_DEPARTURES_CMD 'p'
 #define LIST_ARRIVALS_CMD 'c'
 #define CHANGE_DATE_CMD 't'
+#define LIST_RESERVES_CMD 'r'
+#define DELETE_RESERVE_CMD 'e'
 
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
@@ -49,6 +51,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define INVALID_FLIGHT "invalid flight code\n"
 #define INVALID_DURATION "invalid duration\n"
 #define INVALID_CAPACITY "invalid capacity\n"
+#define INVALID_RESERVE "invalid reservation\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
 #define TOO_MANY_FLIGHTS "too many flights\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
@@ -106,6 +109,13 @@ typedef struct {
 	int capacity;
 } Flight;
 
+/* Time struct */
+typedef struct {
+	char id[69];
+	Flight* flight;
+	int passengers;
+} Reserve;
+
 /*----------------------
  |     GLOBAL STATE		|
  -----------------------*/
@@ -149,6 +159,9 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				  Time* (*time_key)(Flight*));
 void change_date();
+void list_reserves();
+void add_reserve();
+void delete_reserve();
 
 /* auxiliary.c */
 int get_airport(char id[]);
@@ -196,3 +209,7 @@ Date* dep_date_key(Flight* flight);
 Date* arr_date_key(Flight* flight);
 Time* dep_time_key(Flight* flight);
 Time* arr_time_key(Flight* flight);
+
+int is_lower(char s);
+int is_upper(char s);
+int is_digit(char s);
