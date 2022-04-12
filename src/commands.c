@@ -167,18 +167,25 @@ void change_date() {
  |  -T COMMAND
  -----------------------*/
 
- void list_reserves() {
-	 return;
- }
+void list_reserves() { return; }
 
- void add_reserve() {
-	 return;
- }
+void add_reserve() { return; }
 
- /*----------------------
-  |  -E COMMAND
-  -----------------------*/
+/*----------------------
+ |  -E COMMAND
+ -----------------------*/
 
 void delete_reserve() {
-	return;
+	char flight_id[FLIGHT_ID_LENGTH];
+	int n, i;
+	Date test_date = {23, 3, 2022};
+
+	scanf("%s", flight_id);
+
+	if ((n = get_flight(flight_id, &test_date)) >= 0) {
+		printf("%d\n", n);
+		for (i = n; i < system.flights_count - 1; i++)
+			system.flights[i] = system.flights[i + 1];
+		system.flights_count--;
+	}
 }
