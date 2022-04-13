@@ -55,13 +55,16 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define INVALID_FLIGHT "invalid flight code\n"
 #define INVALID_DURATION "invalid duration\n"
 #define INVALID_CAPACITY "invalid capacity\n"
-#define INVALID_RESERVE "invalid reservation\n"
+#define INVALID_RESERVE "invalid reservation code\n"
+#define INVALID_PASSENGER "invalid passager number\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
 #define TOO_MANY_FLIGHTS "too many flights\n"
+#define TOO_MANY_RESERVES "too many reservations\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
 #define NO_SUCH_AIRPORT "%s: no such airport ID\n"
 #define NO_SUCH_FLIGHT "%s: flight does not exist\n"
 #define FLIGHT_ALREADY_EXISTS "flight already exists\n"
+#define RESERVE_ALREADY_EXISTS "%s: flight reservation already used\n"
 #define NOT_FOUND "not found\n"
 
 /* MESSAGES */
@@ -115,6 +118,7 @@ typedef struct {
 	Time arr_time;
 	int capacity;
 	List reserves;
+	int taken_seats;
 } Flight;
 
 /* Time struct */
@@ -180,6 +184,7 @@ int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
 int isvalid_reserve_id(char* id);
+int res_id_already_exists(char reserve_id[]);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);

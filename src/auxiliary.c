@@ -56,10 +56,6 @@ List get_all_flights(char id[]) {
 
 	return l;
 }
-/*
-List get_all_reserves(char id[]) {
-
-} */
 
 int delete_flight(int index) {
 	int i;
@@ -85,6 +81,10 @@ int delete_flight(int index) {
 
 void list_flight_reserves(Flight* flight) {
 	int i, l = flight->reserves.size;
+	if(!isvalid_date(&flight->dep_date)) {
+		printf(INVALID_DATE);
+		return;
+	}
 	for (i = 0; i < l; i++) {
 		print_reserve((Reserve*)list_get(&flight->reserves, i));
 	}
@@ -125,6 +125,24 @@ int isvalid_reserve_id(char* id) {
 	return TRUE;
 }
 
+
+/* Checks if reservation id was already used */
+int res_id_already_exists(char reserve_id[]) {
+	int i, j;
+	List* l;
+	Reserve* r;
+	for (i = 0; i < gbsystem.flights_count; i++) {
+			l = &gbsystem.flights[i].reserves;
+			for (j = 0; j < l->size; j++) {
+				r = (Reserve*)list_get(l, j);
+				if (strcmp(r->id, reserve_id) == 0) {
+					return TRUE;
+				}
+			}
+		}
+	return FALSE;
+}
+
 /*--------------------------
  |  INTIALIAZING FUNCTIONS	|
  ---------------------------*/
@@ -160,6 +178,7 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 	flight->duration = *duration;
 	flight->capacity = capacity;
 	list_init(&flight->reserves);
+	flight->taken_seats = 0;
 }
 
 /*----------------------

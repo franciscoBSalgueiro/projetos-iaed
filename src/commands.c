@@ -177,8 +177,10 @@ void list_reserves() {
 	scanf("%s", flight_id);
 	read_date(&date);
 
-	if ((i = get_flight(flight_id, &date) == -1))
+	if ((i = get_flight(flight_id, &date) == -1)) {
 		printf(NO_SUCH_FLIGHT, flight_id);
+		return;
+	}
 	f = &gbsystem.flights[i];
 
 	if (getchar() != '\n') {
@@ -202,10 +204,31 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
+	if(res_id_already_exists(reserve_id)) {
+		printf(RESERVE_ALREADY_EXISTS, reserve_id);
+		return;
+	}
+
+	if(flight->taken_seats + reserve->passengers > flight->capacity) {
+		printf(TOO_MANY_RESERVES);
+		return;
+	}
+
+	if (!isvalid_date(&flight->dep_date)) {
+		printf(INVALID_DATE);
+		return;
+	}
+
+	if (reserve->passengers < 0) {
+		printf(INVALID_PASSENGER);
+		return;
+	}
+
 	reserve->id = malloc(sizeof(char) * strlen(reserve_id));
 	strcpy(reserve->id, reserve_id);
 
 	list_add(&flight->reserves, reserve);
+	flight->taken_seats += reserve->passengers;
 
 	return;
 }
@@ -216,7 +239,7 @@ void add_reserve(Flight* flight) {
 
 void delete_reserve() {
 	char id[MAX_CMD_LEN];
-	int i, j;
+	int i, j, found = FALSE;
 	List lf, *lr;
 	Reserve* r;
 
@@ -225,6 +248,7 @@ void delete_reserve() {
 	if (strlen(id) < 10) {
 		lf = get_all_flights(id);
 		for (i = 0; i < lf.size; i++) {
+			found = TRUE;
 			delete_flight(*(int*)list_get(&lf, i));
 		}
 	} else {
@@ -233,10 +257,12 @@ void delete_reserve() {
 			for (j = 0; j < lr->size; j++) {
 				r = (Reserve*)list_get(lr, j);
 				if (strcmp(r->id, id) == 0) {
+					found = TRUE;
 					list_remove(lr, j);
 					lr->size--;
 				}
 			}
 		}
 	}
+	if (!found) printf(NOT_FOUND);
 }
