@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "proj1.h"
@@ -27,7 +28,7 @@ void add_airport() {
 		printf(INVALID_AIRPORT_ID);
 		return;
 	}
-	if (system.airports_count == MAX_AIRPORTS) {
+	if (gbsystem.airports_count == MAX_AIRPORTS) {
 		printf(TOO_MANY_AIPORTS);
 		return;
 	}
@@ -39,11 +40,11 @@ void add_airport() {
 	ins_index = -(ins_index + 1); /* Convert index to positive */
 
 	/* Inserts the airport in the correct position alphabetically */
-	memmove(&system.airports[ins_index + 1], &system.airports[ins_index],
-			(system.airports_count - ins_index) * sizeof(Airport));
-	init_airport(&system.airports[ins_index], airport_id, country, city);
+	memmove(&gbsystem.airports[ins_index + 1], &gbsystem.airports[ins_index],
+			(gbsystem.airports_count - ins_index) * sizeof(Airport));
+	init_airport(&gbsystem.airports[ins_index], airport_id, country, city);
 
-	system.airports_count++;
+	gbsystem.airports_count++;
 
 	printf(AIRPORT_ADDED_MESSAGE, airport_id);
 }
@@ -66,11 +67,11 @@ void list_airports() {
 			printf(NO_SUCH_AIRPORT, airportID);
 			continue;
 		}
-		print_airport(&system.airports[i]);
+		print_airport(&gbsystem.airports[i]);
 	}
 	if (!has_argument) /* Only prints all airports if no argument is given */
-		for (i = 0; i < system.airports_count; i++)
-			print_airport(&system.airports[i]);
+		for (i = 0; i < gbsystem.airports_count; i++)
+			print_airport(&gbsystem.airports[i]);
 }
 
 /*----------------------
@@ -81,24 +82,24 @@ void list_airports() {
 void add_flight() {
 	Flight* new_flight;
 
-	new_flight = &system.flights[system.flights_count];
+	new_flight = &gbsystem.flights[gbsystem.flights_count];
 	if (read_flight(new_flight) == ERROR) return;
 	calculate_arrival(new_flight);
 
-	system.arr_flights[system.flights_count] = new_flight;
-	system.dep_flights[system.flights_count] = new_flight;
-	system.flights_count++;
+	gbsystem.arr_flights[gbsystem.flights_count] = new_flight;
+	gbsystem.dep_flights[gbsystem.flights_count] = new_flight;
+	gbsystem.flights_count++;
 
 	/* Resets flags as the array may no longer be sorted */
-	system.is_dep_sorted = FALSE;
-	system.is_arr_sorted = FALSE;
+	gbsystem.is_dep_sorted = FALSE;
+	gbsystem.is_arr_sorted = FALSE;
 }
 
 /* Lists all flights in the system */
 void list_all_flights() {
 	int i;
-	for (i = 0; i < system.flights_count; i++) {
-		print_flight_full(&system.flights[i]);
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		print_flight_full(&gbsystem.flights[i]);
 	}
 }
 
@@ -108,17 +109,17 @@ void list_all_flights() {
 
 /* Lists all flights departing from the specified airport */
 void list_departures() {
-	insertion_sort(system.is_dep_sorted, system.dep_flights, &dep_date_key,
+	insertion_sort(gbsystem.is_dep_sorted, gbsystem.dep_flights, &dep_date_key,
 				   &dep_time_key);
-	list_flights(system.dep_flights, &dep_id_key, &arr_id_key, &dep_date_key,
+	list_flights(gbsystem.dep_flights, &dep_id_key, &arr_id_key, &dep_date_key,
 				 &dep_time_key);
 }
 
 /* Lists all flights arriving to the specified airport */
 void list_arrivals() {
-	insertion_sort(system.is_arr_sorted, system.arr_flights, &arr_date_key,
+	insertion_sort(gbsystem.is_arr_sorted, gbsystem.arr_flights, &arr_date_key,
 				   &arr_time_key);
-	list_flights(system.arr_flights, &arr_id_key, dep_id_key, &arr_date_key,
+	list_flights(gbsystem.arr_flights, &arr_id_key, dep_id_key, &arr_date_key,
 				 &arr_time_key);
 }
 
@@ -135,7 +136,7 @@ void list_flights(Flight* array[], char* (*airport_key_in)(Flight*),
 		return;
 	}
 
-	for (i = 0; i < system.flights_count; i++) {
+	for (i = 0; i < gbsystem.flights_count; i++) {
 		/* Checks for flights from the specified airport */
 		if (strcmp(airport_key_in(array[i]), airport_id) == 0) {
 			print_flight(array[i]->id, airport_key_out(array[i]),
@@ -157,35 +158,81 @@ void change_date() {
 		printf(INVALID_DATE);
 		return;
 	}
-	system.date = new_date;
+	gbsystem.date = new_date;
 
-	print_date(&system.date);
+	print_date(&gbsystem.date);
 	putchar('\n');
 }
 
 /*----------------------
- |  -T COMMAND
+ |  -R COMMAND
  -----------------------*/
 
-void list_reserves() { return; }
+void list_reserves() {
+	char flight_id[FLIGHT_ID_LENGTH];
+	Date date;
+	Flight* f;
+	int i;
 
-void add_reserve() { return; }
+	scanf("%s", flight_id);
+	read_date(&date);
+
+	/* if (!isvalid_reserve_id(flight_id)) printf(INVALID_RESERVE); */
+	if ((i = get_flight(flight_id, &date) == -1))
+		printf(NO_SUCH_FLIGHT, flight_id);
+	f = &gbsystem.flights[i];
+
+	if (getchar() != '\n') {
+		add_reserve(f);
+	} else
+		list_flight_reserves(f);
+}
+
+void add_reserve(Flight* flight) {
+	char reserve_id[MAX_CMD_LEN];
+	Reserve* reserve;
+
+	reserve = malloc(sizeof(Reserve));
+
+	scanf("%s", reserve_id);
+	scanf("%d", &reserve->passengers);
+
+	reserve->id = malloc(sizeof(char) * strlen(reserve_id));
+	strcpy(reserve->id, reserve_id);
+
+	list_add(&flight->reserves, reserve);
+
+	return;
+}
 
 /*----------------------
  |  -E COMMAND
  -----------------------*/
 
 void delete_reserve() {
-	char flight_id[FLIGHT_ID_LENGTH];
-	int n, i;
-	Date test_date = {23, 3, 2022};
+	char id[65535];
+	int i, j;
+	List l;
+	Reserve* r;
 
-	scanf("%s", flight_id);
+	scanf("%s", id);
 
-	if ((n = get_flight(flight_id, &test_date)) >= 0) {
-		printf("%d\n", n);
-		for (i = n; i < system.flights_count - 1; i++)
-			system.flights[i] = system.flights[i + 1];
-		system.flights_count--;
+	l = get_all_flights(id);
+
+	if (l.size > 0) {
+		for (i = 0; i < l.size; i++) {
+			delete_flight(*(int*)list_get(&l, i));
+		}
+	} else {
+		for (i = 0; i < gbsystem.flights_count; i++) {
+			l = gbsystem.flights[i].reserves;
+			for (j = 0; j < l.size; j++) {
+				r = (Reserve*)list_get(&l, j);
+				if (strcmp(r->id, id) == 0) {
+					printf("OK");
+					list_remove(&l, j);
+				}
+			}
+		}
 	}
 }

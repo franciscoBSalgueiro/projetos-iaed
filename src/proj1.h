@@ -4,6 +4,8 @@
  * Description: Constants, globals, structs and prototypes for proj1.c
  */
 
+#include "list.h"
+
 /*----------------------
  |  CONSTANTS & STRINGS  |
  -----------------------*/
@@ -11,6 +13,8 @@
 #define TRUE 1
 #define FALSE 0
 #define ERROR -1
+
+#define MAX_CMD_LEN 65535
 
 #define MAX_FLIGHTS 30000
 #define MAX_AIRPORTS 40
@@ -56,12 +60,15 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define TOO_MANY_FLIGHTS "too many flights\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
 #define NO_SUCH_AIRPORT "%s: no such airport ID\n"
+#define NO_SUCH_FLIGHT "%s: flight does not exist\n"
 #define FLIGHT_ALREADY_EXISTS "flight already exists\n"
+#define NOT_FOUND "not found\n"
 
 /* MESSAGES */
 #define AIRPORT_STRING "%s %s %s %d\n"
 #define FLIGHT_STRING_REDUCED "%s %s "
 #define FLIGHT_STRING "%s %s %s "
+#define RESERVE_STRING "%s %d\n"
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
 /* ARGUMENT FORMATS */
@@ -107,12 +114,12 @@ typedef struct {
 	Date arr_date;
 	Time arr_time;
 	int capacity;
+	List reserves;
 } Flight;
 
 /* Time struct */
 typedef struct {
-	char id[69];
-	Flight* flight;
+	char* id;
 	int passengers;
 } Reserve;
 
@@ -139,7 +146,7 @@ typedef struct {
 	Date date;
 } System;
 
-extern System system;
+extern System gbsystem;
 
 /*----------------------
  | FUNCTION PROTOTYPES	|
@@ -160,15 +167,19 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				  Time* (*time_key)(Flight*));
 void change_date();
 void list_reserves();
-void add_reserve();
+void add_reserve(Flight* flight);
 void delete_reserve();
 
 /* auxiliary.c */
 int get_airport(char id[]);
 int get_flight(char id[], Date* date);
+List get_all_flights(char id[]);
+int delete_flight(int index);
+void list_flight_reserves(Flight* flight);
 int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
-int isvalid_airport_id(char* str);
+int isvalid_airport_id(char* id);
+int isvalid_reserve_id(char* id);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -194,6 +205,7 @@ void print_flight(char* id, char* airport_id, Date* date, Time* time);
 void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
+void print_reserve(Reserve* reserve);
 
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);

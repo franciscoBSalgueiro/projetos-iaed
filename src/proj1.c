@@ -9,16 +9,16 @@
 #include <stdio.h>
 
 /* System declaration */
-System system;
+System gbsystem;
 
 /* Initializes the system and waits for user commands */
 int main() {
 	/* System initialization with initial values */
-	system.airports_count = 0;
-	system.flights_count = 0;
-	system.is_dep_sorted = FALSE;
-	system.is_arr_sorted = FALSE;
-	init_date(&system.date, INITIAL_DATE);
+	gbsystem.airports_count = 0;
+	gbsystem.flights_count = 0;
+	gbsystem.is_dep_sorted = FALSE;
+	gbsystem.is_arr_sorted = FALSE;
+	init_date(&gbsystem.date, INITIAL_DATE);
 
 	/* Continues until the user enters the command 'q' */
 	while (cmd_triage()) {
@@ -42,12 +42,7 @@ int cmd_triage() {
 		case LIST_DEPARTURES_CMD: list_departures(); break;
 		case LIST_ARRIVALS_CMD: list_arrivals(); break;
 		case CHANGE_DATE_CMD: change_date(); break;
-		case LIST_RESERVES_CMD:
-			if (getchar() == '\n') /* No argument given */
-				list_reserves();
-			else
-				add_reserve();
-			break;
+		case LIST_RESERVES_CMD: list_reserves(); break;
 		case DELETE_RESERVE_CMD: delete_reserve(); break;
 		default: break; /* ignore invalid commands */
 	}
