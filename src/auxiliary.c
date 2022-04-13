@@ -44,19 +44,19 @@ int get_flight(char id[], Date* date) {
 }
 
 List get_all_flights(char id[]) {
-	List index;
+	List l;
 	int i;
 
-	list_init(&index);
+	list_init(&l);
 
 	for (i = 0; i < gbsystem.flights_count; i++)
 		if (strcmp(gbsystem.flights[i].id, id) == 0) {
-			list_add(&index, &i);
+			list_add(&l, &i);
 		}
 
-	return index;
+	return l;
 }
-/* 
+/*
 List get_all_reserves(char id[]) {
 
 } */
@@ -86,7 +86,7 @@ int delete_flight(int index) {
 void list_flight_reserves(Flight* flight) {
 	int i, l = flight->reserves.size;
 	for (i = 0; i < l; i++) {
-		print_reserve((Reserve*) list_get(&flight->reserves, i));
+		print_reserve((Reserve*)list_get(&flight->reserves, i));
 	}
 }
 
@@ -120,7 +120,6 @@ int isvalid_airport_id(char* id) {
 int isvalid_reserve_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
-	if (l < 10) return FALSE;
 	for (i = 0; i < l; i++)
 		if (!(is_digit(id[i]) || is_upper(id[i]))) return FALSE;
 	return TRUE;
@@ -160,6 +159,7 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 	flight->dep_time = *dep_time;
 	flight->duration = *duration;
 	flight->capacity = capacity;
+	list_init(&flight->reserves);
 }
 
 /*----------------------

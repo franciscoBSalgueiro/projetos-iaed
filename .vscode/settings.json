@@ -8,6 +8,11 @@
         "typeinfo": "c",
         "*.rh": "c",
         "cmath": "c",
-        "new": "c"
+        "new": "c",
+        "array": "c",
+        "hash_map": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c"
     }
 }
