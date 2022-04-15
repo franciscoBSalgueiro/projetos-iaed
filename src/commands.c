@@ -218,7 +218,7 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	if (passengers < 0) {
+	if (passengers < 1) {
 		printf(INVALID_PASSENGER);
 		return;
 	}
@@ -272,9 +272,9 @@ void delete_reserve() {
 				r = (Reserve*)list_get(lr, j);
 				if (strcmp(r->id, id) == 0) {
 					found = TRUE;
+					gbsystem.flights[i].taken_seats -= r->passengers;
 					free(r->id);
 					list_remove(lr, j);
-					lr->size--;
 				}
 			}
 		}

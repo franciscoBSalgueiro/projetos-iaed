@@ -4,10 +4,10 @@
  * Description: Auxiliary functions
  */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
 
 #include "proj1.h"
 
@@ -15,13 +15,13 @@ void* custom_alloc(long unsigned int size) {
 	void* ptr = malloc(size);
 	if (!ptr) {
 		printf("No memory\n");
-		clear_memory();
+		clear_reserves();
 		exit(1);
 	}
 	return ptr;
 }
 
-void clear_memory() {
+void clear_reserves() {
 	int i, j;
 	Reserve* r;
 
@@ -87,16 +87,28 @@ int delete_flight(int index) {
 	Flight* flight = &gbsystem.flights[index];
 	Reserve* r;
 
-	memmove(&gbsystem.flights[index], &gbsystem.flights[index + 1],
-			(gbsystem.flights_count - index - 1) * sizeof(Flight));
+	/* free reserves in ordered lists gbsystems dep_flights and arr_flights */
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		if (gbsystem.dep_flights[i] == flight && i < gbsystem.flights_count - 1)
+			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
+					(gbsystem.flights_count - i - 1) * sizeof(Flight*));
+		if (gbsystem.arr_flights[i] == flight && i < gbsystem.flights_count - 1)
+			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
+					(gbsystem.flights_count - i - 1) * sizeof(Flight*));
+	}
+
+	if(index < gbsystem.flights_count - 1) {
+		memcpy(&gbsystem.flights[index], &gbsystem.flights[index + 1],
+				(gbsystem.flights_count - index - 1) * sizeof(Flight));
+	}
 
 	for (i = 0; i < flight->reserves.size; i++) {
 		r = (Reserve*)list_get(&flight->reserves, i);
 		free(r->id);
 	}
 	list_destroy(&flight->reserves);
-	gbsystem.flights_count--;
 
+	gbsystem.flights_count--;
 	return 0;
 }
 
@@ -410,8 +422,7 @@ int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 		return printf(INVALID_DURATION);
 
 	/* Invalid flight capacity */
-	if (capacity < MIN_CAPACITY || capacity > MAX_CAPACITY)
-		return printf(INVALID_CAPACITY);
+	if (capacity < MIN_CAPACITY) return printf(INVALID_CAPACITY);
 	return FALSE;
 }
 

@@ -23,7 +23,6 @@
 #define MAX_CITY_NAME_LENGTH 51
 
 #define MIN_CAPACITY 10
-#define MAX_CAPACITY 100
 #define MAX_DURATION 12
 
 #define NUM_MINUTES 60
@@ -54,7 +53,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define INVALID_DURATION "invalid duration\n"
 #define INVALID_CAPACITY "invalid capacity\n"
 #define INVALID_RESERVE "invalid reservation code\n"
-#define INVALID_PASSENGER "invalid passager number\n"
+#define INVALID_PASSENGER "invalid passenger number\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
 #define TOO_MANY_FLIGHTS "too many flights\n"
 #define TOO_MANY_RESERVES "too many reservations\n"
@@ -242,7 +241,7 @@ int is_upper(char s);
 int is_digit(char s);
 
 void* custom_alloc(long unsigned int size);
-void clear_memory();
+void clear_reserves();
 
 void list_init(List* list);
 void list_add(List* list, void* data);

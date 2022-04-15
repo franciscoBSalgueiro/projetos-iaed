@@ -27,7 +27,7 @@ int main() {
 	}
 
 	/* free all reserves from flights */
-	clear_memory();
+	clear_reserves();
 	return 0;
 }
 

@@ -6,6 +6,7 @@ run : build
 
 test: build
 	./test.sh ./$(FILE).out ./tests/community_tests
+	./test.sh ./$(FILE).out ./tests/tests
 
 build:
 	gcc $(CFLAGS) ./src/*.c -o $(FILE).out
