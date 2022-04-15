@@ -38,7 +38,7 @@ int get_flight(char id[], Date* date) {
 	int i;
 	for (i = 0; i < gbsystem.flights_count; i++)
 		if (strcmp(gbsystem.flights[i].id, id) == 0 &&
-			cmp_date(&gbsystem.flights->dep_date, date) == 0) {
+			cmp_date(&gbsystem.flights[i].dep_date, date) == 0) {
 			return i;
 		}
 	return -1;
