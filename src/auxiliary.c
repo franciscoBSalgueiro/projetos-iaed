@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "proj1.h"
@@ -43,37 +44,32 @@ int get_flight(char id[], Date* date) {
 	return -1;
 }
 
-List get_all_flights(char id[]) {
-	List l;
-	int i;
-
-	list_init(&l);
+void get_all_flights(List* l, char id[]) {
+	int i, *data = malloc(sizeof(int));
 
 	for (i = 0; i < gbsystem.flights_count; i++)
 		if (strcmp(gbsystem.flights[i].id, id) == 0) {
-			list_add(&l, &i);
+			*data = i;
+			list_add(l, data);
 		}
-
-	return l;
 }
 
 int delete_flight(int index) {
 	int i;
-	Flight* flight;
+	/* Flight* flight = &gbsystem.flights[index];
+	Reserve* r; */
 
-	flight = &gbsystem.flights[index];
-
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.arr_flights[i] == flight) {
-			gbsystem.arr_flights[i] = NULL;
-		}
-		if (gbsystem.dep_flights[i] == flight) {
-			gbsystem.dep_flights[i] = NULL;
-		}
-	}
-
-	memmove(&gbsystem.flights[index], &gbsystem.flights[index + 1],
+	/* memmove(&gbsystem.flights[index], &gbsystem.flights[index + 1],
 			(gbsystem.flights_count - index - 1) * sizeof(Flight));
+	 */
+	for (i = index; i < gbsystem.flights_count - 1; i++)
+		gbsystem.flights[i] = gbsystem.flights[i + 1];
+
+	/* for (i = 0; i < flight->reserves.size; i++) {
+		r = (Reserve*)list_get(&flight->reserves, i);
+		free(r->id);
+	}
+	list_destroy(&flight->reserves); */
 	gbsystem.flights_count--;
 
 	return 0;
@@ -81,7 +77,7 @@ int delete_flight(int index) {
 
 void list_flight_reserves(Flight* flight) {
 	int i, l = flight->reserves.size;
-	if(!isvalid_date(&flight->dep_date)) {
+	if (!isvalid_date(&flight->dep_date)) {
 		printf(INVALID_DATE);
 		return;
 	}
@@ -125,21 +121,20 @@ int isvalid_reserve_id(char* id) {
 	return TRUE;
 }
 
-
 /* Checks if reservation id was already used */
 int res_id_already_exists(char reserve_id[]) {
 	int i, j;
 	List* l;
 	Reserve* r;
 	for (i = 0; i < gbsystem.flights_count; i++) {
-			l = &gbsystem.flights[i].reserves;
-			for (j = 0; j < l->size; j++) {
-				r = (Reserve*)list_get(l, j);
-				if (strcmp(r->id, reserve_id) == 0) {
-					return TRUE;
-				}
+		l = &gbsystem.flights[i].reserves;
+		for (j = 0; j < l->size; j++) {
+			r = (Reserve*)list_get(l, j);
+			if (strcmp(r->id, reserve_id) == 0) {
+				return TRUE;
 			}
 		}
+	}
 	return FALSE;
 }
 

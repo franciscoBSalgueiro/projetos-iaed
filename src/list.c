@@ -77,9 +77,8 @@ void* list_get(List* list, int index) {
 	int i = 0;
 
 	while (node != NULL) {
-		if (i == index) {
+		if (i == index)
 			return node->data;
-		}
 
 		node = node->next;
 		i++;
@@ -94,6 +93,7 @@ void list_destroy(List* list) {
 
 	while (node != NULL) {
 		next = node->next;
+		free(node->data);
 		free(node);
 		node = next;
 	}

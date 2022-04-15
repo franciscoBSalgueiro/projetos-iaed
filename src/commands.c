@@ -184,22 +184,19 @@ void list_reserves() {
 
 	f = &gbsystem.flights[i];
 
-	if (getchar() != '\n') {
+	if (getchar() != '\n')
 		add_reserve(f);
-	} else {
+	else
 		list_flight_reserves(f);
-	}
 }
 
 void add_reserve(Flight* flight) {
 	char reserve_id[MAX_CMD_LEN];
 	Reserve *reserve, *tmp;
-	int i, b = FALSE;
-
-	reserve = malloc(sizeof(Reserve));
+	int i, passengers, b = FALSE;
 
 	scanf("%s", reserve_id);
-	scanf("%d", &reserve->passengers);
+	scanf("%d", &passengers);
 
 	if (!isvalid_reserve_id(reserve_id)) {
 		printf(INVALID_RESERVE);
@@ -211,7 +208,7 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	if (flight->taken_seats + reserve->passengers > flight->capacity) {
+	if (flight->taken_seats + passengers > flight->capacity) {
 		printf(TOO_MANY_RESERVES);
 		return;
 	}
@@ -221,12 +218,14 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	if (reserve->passengers < 0) {
+	if (passengers < 0) {
 		printf(INVALID_PASSENGER);
 		return;
 	}
 
+	reserve = malloc(sizeof(Reserve));
 	reserve->id = malloc(sizeof(char) * (strlen(reserve_id) + 1));
+	reserve->passengers = passengers;
 	strcpy(reserve->id, reserve_id);
 
 	/* Insert in list alphabetically */
@@ -254,14 +253,16 @@ void delete_reserve() {
 	int i, j, found = FALSE;
 	List lf, *lr;
 	Reserve* r;
+	ListNode* n;
 
 	scanf("%s", id);
 
 	if (strlen(id) < 10) {
-		lf = get_all_flights(id);
-		for (i = 0; i < lf.size; i++) {
+		list_init(&lf);
+		get_all_flights(&lf, id);
+		for (n = lf.head; n != NULL; n = n->next) {
 			found = TRUE;
-			delete_flight(*(int*)list_get(&lf, i));
+			delete_flight(*(int*)n->data);
 		}
 		list_destroy(&lf);
 	} else {

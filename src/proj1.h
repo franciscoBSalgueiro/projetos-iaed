@@ -177,7 +177,7 @@ void delete_reserve();
 /* auxiliary.c */
 int get_airport(char id[]);
 int get_flight(char id[], Date* date);
-List get_all_flights(char id[]);
+void get_all_flights(List* l, char id[]);
 int delete_flight(int index);
 void list_flight_reserves(Flight* flight);
 int get_num_flights(char* id);
