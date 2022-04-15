@@ -14,8 +14,6 @@ System gbsystem;
 
 /* Initializes the system and waits for user commands */
 int main() {
-	int i, j;
-	Reserve* r;
 
 	/* System initialization with initial values */
 	gbsystem.airports_count = 0;
@@ -29,16 +27,7 @@ int main() {
 	}
 
 	/* free all reserves from flights */
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (&gbsystem.flights[i] != NULL &&
-			&gbsystem.flights[i].reserves != NULL) {
-			for (j = 0; j < gbsystem.flights[i].reserves.size; j++) {
-				r = (Reserve*)list_get(&gbsystem.flights[i].reserves, j);
-				free(r->id);
-			}
-			list_destroy(&gbsystem.flights[i].reserves);
-		}
-	}
+	clear_memory();
 	return 0;
 }
 

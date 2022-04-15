@@ -223,8 +223,8 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	reserve = malloc(sizeof(Reserve));
-	reserve->id = malloc(sizeof(char) * (strlen(reserve_id) + 1));
+	reserve = custom_alloc(sizeof(Reserve));
+	reserve->id = custom_alloc(sizeof(char) * (strlen(reserve_id) + 1));
 	reserve->passengers = passengers;
 	strcpy(reserve->id, reserve_id);
 

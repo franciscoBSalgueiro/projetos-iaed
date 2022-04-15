@@ -4,8 +4,6 @@
  * Description: Constants, globals, structs and prototypes for proj1.c
  */
 
-#include "list.h"
-
 /*----------------------
  |  CONSTANTS & STRINGS  |
  -----------------------*/
@@ -85,6 +83,18 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 /*--------------
  |   STRUCTS 	|
  ---------------*/
+
+
+typedef struct ListNode {
+    void* data;
+    struct ListNode* next;
+} ListNode;
+
+typedef struct List {
+    ListNode* head;
+    ListNode* tail;
+    int size;
+} List;
 
 /* Airport struct */
 typedef struct {
@@ -230,3 +240,13 @@ Time* arr_time_key(Flight* flight);
 int is_lower(char s);
 int is_upper(char s);
 int is_digit(char s);
+
+void* custom_alloc(long unsigned int size);
+void clear_memory();
+
+void list_init(List* list);
+void list_add(List* list, void* data);
+void list_insert(List* list, void* data, int index);
+void list_remove(List* list, int index);
+void* list_get(List* list, int index);
+void list_destroy(List* list);

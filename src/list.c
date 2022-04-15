@@ -1,4 +1,4 @@
-#include "list.h"
+#include "proj1.h"
 
 #include <stdlib.h>
 
@@ -9,7 +9,7 @@ void list_init(List* list) {
 }
 
 void list_add(List* list, void* data) {
-	ListNode* node = malloc(sizeof(ListNode));
+	ListNode* node = custom_alloc(sizeof(ListNode));
 	node->data = data;
 	node->next = NULL;
 
@@ -29,7 +29,7 @@ void list_add(List* list, void* data) {
 
 void list_insert(List* list, void* data, int index) {
 	int i;
-	ListNode *prev, *node = malloc(sizeof(ListNode));
+	ListNode *prev, *node = custom_alloc(sizeof(ListNode));
 	node->data = data;
 
 	if (index == 0) {

@@ -7,8 +7,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 
 #include "proj1.h"
+
+void* custom_alloc(long unsigned int size) {
+	void* ptr = malloc(size);
+	if (!ptr) {
+		printf("No memory\n");
+		clear_memory();
+		exit(1);
+	}
+	return ptr;
+}
+
+void clear_memory() {
+	int i, j;
+	Reserve* r;
+
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		if (&gbsystem.flights[i] != NULL &&
+			&gbsystem.flights[i].reserves != NULL) {
+			for (j = 0; j < gbsystem.flights[i].reserves.size; j++) {
+				r = (Reserve*)list_get(&gbsystem.flights[i].reserves, j);
+				free(r->id);
+			}
+			list_destroy(&gbsystem.flights[i].reserves);
+		}
+	}
+}
 
 /*--------------------------
  |      GET FUNCTIONS       |
@@ -49,7 +76,7 @@ void get_all_flights(List* l, char id[]) {
 
 	for (i = 0; i < gbsystem.flights_count; i++)
 		if (strcmp(gbsystem.flights[i].id, id) == 0) {
-			data = malloc(sizeof(int));
+			data = custom_alloc(sizeof(int));
 			*data = i;
 			list_add(l, data);
 		}
