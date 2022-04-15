@@ -85,30 +85,30 @@ void get_all_flights(List* l, char id[]) {
 int delete_flight(int index) {
 	int i;
 	Flight* flight = &gbsystem.flights[index];
-	Reserve* r;
+	ListNode* n;
 
-	/* free reserves in ordered lists gbsystems dep_flights and arr_flights */
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.dep_flights[i] == flight && i < gbsystem.flights_count - 1)
-			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
-					(gbsystem.flights_count - i - 1) * sizeof(Flight*));
-		if (gbsystem.arr_flights[i] == flight && i < gbsystem.flights_count - 1)
-			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
-					(gbsystem.flights_count - i - 1) * sizeof(Flight*));
-	}
-
-	if(index < gbsystem.flights_count - 1) {
-		memcpy(&gbsystem.flights[index], &gbsystem.flights[index + 1],
-				(gbsystem.flights_count - index - 1) * sizeof(Flight));
-	}
-
-	for (i = 0; i < flight->reserves.size; i++) {
-		r = (Reserve*)list_get(&flight->reserves, i);
-		free(r->id);
+	for (n = flight->reserves.head; n != NULL; n = n->next) {
+		free(((Reserve*)n->data)->id);
 	}
 	list_destroy(&flight->reserves);
 
 	gbsystem.flights_count--;
+
+	/* Remove flight from lists */
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		if (gbsystem.dep_flights[i] == flight && i < gbsystem.flights_count)
+			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
+				   (gbsystem.flights_count - i) * sizeof(Flight*));
+		if (gbsystem.arr_flights[i] == flight && i < gbsystem.flights_count)
+			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
+				   (gbsystem.flights_count - i) * sizeof(Flight*));
+	}
+
+	if (index < gbsystem.flights_count) {
+		memcpy(&gbsystem.flights[index], &gbsystem.flights[index + 1],
+			   (gbsystem.flights_count - index) * sizeof(Flight));
+	}
+
 	return 0;
 }
 
@@ -149,10 +149,12 @@ int isvalid_airport_id(char* id) {
 	return TRUE;
 }
 
-/* Checks if string contains only digits or uppercase letters */
+/* Checks if string is longer than 10 char and
+ * contains only digits or uppercase letters */
 int isvalid_reserve_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
+	if (l < 10) return FALSE;
 	for (i = 0; i < l; i++)
 		if (!(is_digit(id[i]) || is_upper(id[i]))) return FALSE;
 	return TRUE;

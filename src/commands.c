@@ -260,9 +260,10 @@ void delete_reserve() {
 	if (strlen(id) < 10) {
 		list_init(&lf);
 		get_all_flights(&lf, id);
-		for (n = lf.head; n != NULL; n = n->next) {
+		i = 0;
+		for (n = lf.head; n != NULL; n = n->next, i++) {
 			found = TRUE;
-			delete_flight(*(int*)n->data);
+			delete_flight(*(int*)n->data - i);
 		}
 		list_destroy(&lf);
 	} else {
