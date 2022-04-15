@@ -177,10 +177,11 @@ void list_reserves() {
 	scanf("%s", flight_id);
 	read_date(&date);
 
-	if ((i = get_flight(flight_id, &date) == -1)) {
+	if ((i = get_flight(flight_id, &date)) == -1) {
 		printf(NO_SUCH_FLIGHT, flight_id);
 		return;
 	}
+
 	f = &gbsystem.flights[i];
 
 	if (getchar() != '\n') {
@@ -192,7 +193,8 @@ void list_reserves() {
 
 void add_reserve(Flight* flight) {
 	char reserve_id[MAX_CMD_LEN];
-	Reserve* reserve;
+	Reserve *reserve, *tmp;
+	int i, b = FALSE;
 
 	reserve = malloc(sizeof(Reserve));
 
@@ -204,12 +206,12 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	if(res_id_already_exists(reserve_id)) {
+	if (res_id_already_exists(reserve_id)) {
 		printf(RESERVE_ALREADY_EXISTS, reserve_id);
 		return;
 	}
 
-	if(flight->taken_seats + reserve->passengers > flight->capacity) {
+	if (flight->taken_seats + reserve->passengers > flight->capacity) {
 		printf(TOO_MANY_RESERVES);
 		return;
 	}
@@ -224,10 +226,20 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	reserve->id = malloc(sizeof(char) * strlen(reserve_id));
+	reserve->id = malloc(sizeof(char) * (strlen(reserve_id) + 1));
 	strcpy(reserve->id, reserve_id);
 
-	list_add(&flight->reserves, reserve);
+	/* Insert in list alphabetically */
+	for (i = 0; i < flight->reserves.size; i++) {
+		tmp = (Reserve*)list_get(&flight->reserves, i);
+		if (strcmp(reserve->id, tmp->id) < 0) {
+			list_insert(&flight->reserves, reserve, i);
+			b = TRUE;
+			break;
+		}
+	}
+	if (!b) list_add(&flight->reserves, reserve);
+
 	flight->taken_seats += reserve->passengers;
 
 	return;
