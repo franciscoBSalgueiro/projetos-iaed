@@ -68,6 +68,7 @@ void list_remove(List* list, int index) {
 		prev->next = node->next;
 	}
 
+	free(node->data);
 	free(node);
 	list->size--;
 }

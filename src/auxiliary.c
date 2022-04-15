@@ -45,10 +45,11 @@ int get_flight(char id[], Date* date) {
 }
 
 void get_all_flights(List* l, char id[]) {
-	int i, *data = malloc(sizeof(int));
+	int i, *data;
 
 	for (i = 0; i < gbsystem.flights_count; i++)
 		if (strcmp(gbsystem.flights[i].id, id) == 0) {
+			data = malloc(sizeof(int));
 			*data = i;
 			list_add(l, data);
 		}
@@ -56,20 +57,17 @@ void get_all_flights(List* l, char id[]) {
 
 int delete_flight(int index) {
 	int i;
-	/* Flight* flight = &gbsystem.flights[index];
-	Reserve* r; */
+	Flight* flight = &gbsystem.flights[index];
+	Reserve* r;
 
-	/* memmove(&gbsystem.flights[index], &gbsystem.flights[index + 1],
+	memmove(&gbsystem.flights[index], &gbsystem.flights[index + 1],
 			(gbsystem.flights_count - index - 1) * sizeof(Flight));
-	 */
-	for (i = index; i < gbsystem.flights_count - 1; i++)
-		gbsystem.flights[i] = gbsystem.flights[i + 1];
 
-	/* for (i = 0; i < flight->reserves.size; i++) {
+	for (i = 0; i < flight->reserves.size; i++) {
 		r = (Reserve*)list_get(&flight->reserves, i);
 		free(r->id);
 	}
-	list_destroy(&flight->reserves); */
+	list_destroy(&flight->reserves);
 	gbsystem.flights_count--;
 
 	return 0;

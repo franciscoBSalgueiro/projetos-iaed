@@ -1,4 +1,6 @@
 *.exe
 *.out
-/tests/*.result
+tests/
 *.zip
+vgcore*
+.vscode/
