@@ -15,5 +15,4 @@ void list_add(List* list, void* data);
 void list_insert(List* list, void* data, int index);
 void list_remove(List* list, int index);
 void* list_get(List* list, int index);
-void list_clear(List* list);
 void list_destroy(List* list);

@@ -13,3 +13,6 @@ build:
 zip : 
 	cd ./src &&	zip $(FILE).zip *.c *.h
 	mv ./src/$(FILE).zip ./$(FILE).zip
+
+clean :
+	rm vgcore*

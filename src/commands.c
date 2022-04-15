@@ -263,6 +263,7 @@ void delete_reserve() {
 			found = TRUE;
 			delete_flight(*(int*)list_get(&lf, i));
 		}
+		list_destroy(&lf);
 	} else {
 		for (i = 0; i < gbsystem.flights_count; i++) {
 			lr = &gbsystem.flights[i].reserves;
@@ -270,6 +271,7 @@ void delete_reserve() {
 				r = (Reserve*)list_get(lr, j);
 				if (strcmp(r->id, id) == 0) {
 					found = TRUE;
+					free(r->id);
 					list_remove(lr, j);
 					lr->size--;
 				}

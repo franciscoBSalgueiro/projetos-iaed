@@ -88,7 +88,7 @@ void* list_get(List* list, int index) {
 	return NULL;
 }
 
-void list_clear(List* list) {
+void list_destroy(List* list) {
 	ListNode* node = list->head;
 	ListNode* next;
 
@@ -101,9 +101,4 @@ void list_clear(List* list) {
 	list->head = NULL;
 	list->tail = NULL;
 	list->size = 0;
-}
-
-void list_destroy(List* list) {
-	list_clear(list);
-	free(list);
 }
