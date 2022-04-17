@@ -22,7 +22,7 @@ int main() {
 	gbsystem.is_arr_sorted = FALSE;
 	init_date(&gbsystem.date, INITIAL_DATE);
 
-	gbsystem.reserves_ids = hashtable_create();
+	gbsystem.reservation_ids = hashtable_create();
 
 	/* Continues until the user enters the command 'q' */
 	while (cmd_triage()) {
@@ -48,8 +48,8 @@ int cmd_triage() {
 		case LIST_DEPARTURES_CMD: list_departures(); break;
 		case LIST_ARRIVALS_CMD: list_arrivals(); break;
 		case CHANGE_DATE_CMD: change_date(); break;
-		case LIST_RESERVES_CMD: list_reserves(); break;
-		case DELETE_RESERVE_CMD: delete_reserve(); break;
+		case LIST_RESERVATIONS_CMD: list_reservations(); break;
+		case DELETE_RESERVATION_CMD: delete_reservation(); break;
 		default: break; /* ignore invalid commands */
 	}
 	return 1; /* waits for next command */

@@ -1,6 +1,12 @@
-#include "proj1.h"
+/*
+ * File:  list.c
+ * Author:  Francisco Salgueiro
+ * Description: List implementation
+ */
 
 #include <stdlib.h>
+
+#include "proj1.h"
 
 void list_init(List* list) {
 	list->head = NULL;
@@ -28,7 +34,7 @@ void list_add(List* list, void* data) {
 }
 
 void list_insert(List* list, void* data, ListNode* node) {
-	ListNode *new_node = custom_alloc(sizeof(ListNode));
+	ListNode* new_node = custom_alloc(sizeof(ListNode));
 	new_node->data = data;
 	if (node == NULL) {
 		new_node->next = list->head;
@@ -51,7 +57,6 @@ void list_remove(List* list, ListNode* node, ListNode* prev) {
 	}
 
 	list->size--;
-	/* free(node->data); */
 	free(node);
 }
 
@@ -60,8 +65,7 @@ void* list_get(List* list, int index) {
 	int i = 0;
 
 	while (node != NULL) {
-		if (i == index)
-			return node->data;
+		if (i == index) return node->data;
 
 		node = node->next;
 		i++;

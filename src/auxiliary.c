@@ -23,9 +23,9 @@ void* custom_alloc(long unsigned int size) {
 
 void clear_memory() {
 	int i;
-	hashtable_destroy(gbsystem.reserves_ids);
+	hashtable_destroy(gbsystem.reservation_ids);
 	for (i = 0; i < gbsystem.flights_count; i++) {
-		list_destroy(&gbsystem.flights[i].reserves);
+		list_destroy(&gbsystem.flights[i].reservations);
 	}
 }
 
@@ -77,12 +77,12 @@ void get_all_flights(List* l, char id[]) {
 int delete_flight(int index) {
 	int i;
 	Flight* flight = &gbsystem.flights[index];
-	ListNode *n;
+	ListNode* n;
 
-	for (n = flight->reserves.head; n != NULL; n = n->next) {
-		hashtable_remove(gbsystem.reserves_ids, n->data);
+	for (n = flight->reservations.head; n != NULL; n = n->next) {
+		hashtable_remove(gbsystem.reservation_ids, n->data);
 	}
-	list_destroy(&flight->reserves);
+	list_destroy(&flight->reservations);
 
 	gbsystem.flights_count--;
 
@@ -104,14 +104,14 @@ int delete_flight(int index) {
 	return 0;
 }
 
-void list_flight_reserves(Flight* flight) {
-	int i, l = flight->reserves.size;
+void list_flight_reservations(Flight* flight) {
+	int i, l = flight->reservations.size;
 	if (!isvalid_date(&flight->dep_date)) {
 		printf(INVALID_DATE);
 		return;
 	}
 	for (i = 0; i < l; i++) {
-		print_reserve((Reserve*)list_get(&flight->reserves, i));
+		print_reservations((Reservation*)list_get(&flight->reservations, i));
 	}
 }
 
@@ -143,7 +143,7 @@ int isvalid_airport_id(char* id) {
 
 /* Checks if string is longer than 10 char and
  * contains only digits or uppercase letters */
-int isvalid_reserve_id(char* id) {
+int isvalid_reservation_id(char* id) {
 	unsigned int i, l;
 	l = strlen(id);
 	if (l < 10) return FALSE;
@@ -186,7 +186,7 @@ void init_flight(Flight* flight, char* id, Airport* departure, Airport* arrival,
 	flight->dep_time = *dep_time;
 	flight->duration = *duration;
 	flight->capacity = capacity;
-	list_init(&flight->reserves);
+	list_init(&flight->reservations);
 	flight->taken_seats = 0;
 }
 
@@ -363,8 +363,8 @@ void print_time(Time* time) {
 	printf(OUT_TIME_FORMAT, time->hours, time->minutes);
 }
 
-void print_reserve(Reserve* reserve) {
-	printf(RESERVE_STRING, reserve->id, reserve->passengers);
+void print_reservations(Reservation* reservation) {
+	printf(RESERVATION_STRING, reservation->id, reservation->passengers);
 }
 
 /*----------------------

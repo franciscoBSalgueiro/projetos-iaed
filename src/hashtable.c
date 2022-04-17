@@ -1,4 +1,8 @@
-/* Implementation of HashTable for storing a list of reservations */
+/*
+ * File:  list.c
+ * Author:  Francisco Salgueiro
+ * Description: Hashtable implementation for storing Reservations
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +36,7 @@ void hashtable_destroy(HashTable* ht) {
 		ListNode* node = ht->table[i].head;
 		while (node != NULL) {
 			ListNode* next = node->next;
-			free(((Reserve*)node->data)->id);
+			free(((Reservation*)node->data)->id);
 			free(node->data);
 			free(node);
 			node = next;
@@ -42,13 +46,13 @@ void hashtable_destroy(HashTable* ht) {
 }
 
 /* Removes string from HashTable */
-void hashtable_remove(HashTable* ht, Reserve* r) {
+void hashtable_remove(HashTable* ht, Reservation* r) {
 	int index = hash(r->id);
 	ListNode* node = ht->table[index].head;
 	ListNode* prev = NULL;
 	while (node != NULL) {
 		if (node->data == r) {
-			free(((Reserve*)node->data)->id);
+			free(((Reservation*)node->data)->id);
 			free(node->data);
 			list_remove(&ht->table[index], node, prev);
 			return;
@@ -59,18 +63,18 @@ void hashtable_remove(HashTable* ht, Reserve* r) {
 }
 
 /* Adds a new string to the HashTable */
-void hashtable_add(HashTable* ht, Reserve* r) {
+void hashtable_add(HashTable* ht, Reservation* r) {
 	int index = hash(r->id);
 	list_add(&ht->table[index], r);
 }
 
-/* Returns true if the HashTable contains the reserve with that id */
+/* Returns true if the HashTable contains the reservation with that id */
 int hashtable_contains(HashTable* ht, char* str) {
 	int index = hash(str);
 	ListNode* node = ht->table[index].head;
 
 	while (node != NULL) {
-		if (strcmp(((Reserve*)node->data)->id, str) == 0) return TRUE;
+		if (strcmp(((Reservation*)node->data)->id, str) == 0) return TRUE;
 		node = node->next;
 	}
 	return FALSE;
@@ -81,8 +85,8 @@ Flight* hashtable_get(HashTable* ht, char* id) {
 	ListNode* node = ht->table[index].head;
 
 	while (node != NULL) {
-		if (strcmp(((Reserve*)node->data)->id, id) == 0)
-			return ((Reserve*)node->data)->flight;
+		if (strcmp(((Reservation*)node->data)->id, id) == 0)
+			return ((Reservation*)node->data)->flight;
 		node = node->next;
 	}
 	return NULL;

@@ -43,8 +43,8 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define LIST_DEPARTURES_CMD 'p'
 #define LIST_ARRIVALS_CMD 'c'
 #define CHANGE_DATE_CMD 't'
-#define LIST_RESERVES_CMD 'r'
-#define DELETE_RESERVE_CMD 'e'
+#define LIST_RESERVATIONS_CMD 'r'
+#define DELETE_RESERVATION_CMD 'e'
 
 /* ERRORS */
 #define INVALID_AIRPORT_ID "invalid airport ID\n"
@@ -52,23 +52,23 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define INVALID_FLIGHT "invalid flight code\n"
 #define INVALID_DURATION "invalid duration\n"
 #define INVALID_CAPACITY "invalid capacity\n"
-#define INVALID_RESERVE "invalid reservation code\n"
+#define INVALID_RESERVATION "invalid reservation code\n"
 #define INVALID_PASSENGER "invalid passenger number\n"
 #define TOO_MANY_AIPORTS "too many airports\n"
 #define TOO_MANY_FLIGHTS "too many flights\n"
-#define TOO_MANY_RESERVES "too many reservations\n"
+#define TOO_MANY_RESERVATIONS "too many reservations\n"
 #define DUPLICATE_AIRPORT "duplicate airport\n"
 #define NO_SUCH_AIRPORT "%s: no such airport ID\n"
 #define NO_SUCH_FLIGHT "%s: flight does not exist\n"
 #define FLIGHT_ALREADY_EXISTS "flight already exists\n"
-#define RESERVE_ALREADY_EXISTS "%s: flight reservation already used\n"
+#define RESERVATION_ALREADY_EXISTS "%s: flight reservation already used\n"
 #define NOT_FOUND "not found\n"
 
 /* MESSAGES */
 #define AIRPORT_STRING "%s %s %s %d\n"
 #define FLIGHT_STRING_REDUCED "%s %s "
 #define FLIGHT_STRING "%s %s %s "
-#define RESERVE_STRING "%s %d\n"
+#define RESERVATION_STRING "%s %d\n"
 #define AIRPORT_ADDED_MESSAGE "airport %s\n"
 
 /* ARGUMENT FORMATS */
@@ -86,14 +86,14 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define HASH_TABLE_SIZE 20047
 
 typedef struct ListNode {
-    void* data;
-    struct ListNode* next;
+	void* data;
+	struct ListNode* next;
 } ListNode;
 
 typedef struct List {
-    ListNode* head;
-    ListNode* tail;
-    int size;
+	ListNode* head;
+	ListNode* tail;
+	int size;
 } List;
 
 /* HashTable struct */
@@ -132,7 +132,7 @@ typedef struct {
 	Date arr_date;
 	Time arr_time;
 	int capacity;
-	List reserves;
+	List reservations;
 	int taken_seats;
 } Flight;
 
@@ -141,7 +141,7 @@ typedef struct {
 	char* id;
 	int passengers;
 	Flight* flight;
-} Reserve;
+} Reservation;
 
 /*----------------------
  |     GLOBAL STATE		|
@@ -163,7 +163,7 @@ typedef struct {
 	int is_dep_sorted, is_arr_sorted;
 
 	/* Hash table for reservations */
-	HashTable* reserves_ids;
+	HashTable* reservation_ids;
 
 	/* Current system date */
 	Date date;
@@ -189,20 +189,20 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				  Time* (*time_key)(Flight*));
 void change_date();
-void list_reserves();
-void add_reserve(Flight* flight);
-void delete_reserve();
+void list_reservations();
+void add_reservation(Flight* flight);
+void delete_reservation();
 
 /* auxiliary.c */
 int get_airport(char id[]);
 int get_flight(char id[], Date* date);
 void get_all_flights(List* l, char id[]);
 int delete_flight(int index);
-void list_flight_reserves(Flight* flight);
+void list_flight_reservations(Flight* flight);
 int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
-int isvalid_reserve_id(char* id);
+int isvalid_reservation_id(char* id);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -228,7 +228,7 @@ void print_flight(char* id, char* airport_id, Date* date, Time* time);
 void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
-void print_reserve(Reserve* reserve);
+void print_reservations(Reservation* reservation);
 
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
@@ -264,7 +264,7 @@ void list_destroy(List* list);
 int hash(char* v);
 HashTable* hashtable_create();
 void hashtable_destroy(HashTable* ht);
-void hashtable_remove(HashTable* ht, Reserve* r);
-void hashtable_add(HashTable* ht, Reserve* r);
+void hashtable_remove(HashTable* ht, Reservation* r);
+void hashtable_add(HashTable* ht, Reservation* r);
 int hashtable_contains(HashTable* ht, char* str);
 Flight* hashtable_get(HashTable* ht, char* id);

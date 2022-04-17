@@ -168,8 +168,8 @@ void change_date() {
  |  -R COMMAND
  -----------------------*/
 
-/* Lists all the reserves from flight or adds a new one */
-void list_reserves() {
+/* Lists all the reservations from flight or adds a new one */
+void list_reservations() {
 	char flight_id[FLIGHT_ID_LENGTH];
 	Date date;
 	Flight* f;
@@ -186,33 +186,33 @@ void list_reserves() {
 	f = &gbsystem.flights[i];
 
 	if (getchar() != '\n')
-		add_reserve(f);
+		add_reservation(f);
 	else
-		list_flight_reserves(f);
+		list_flight_reservations(f);
 }
 
 /* Adds a new reservation to the flight */
-void add_reserve(Flight* flight) {
-	char reserve_id[MAX_CMD_LEN];
-	Reserve *reserve, *tmp;
+void add_reservation(Flight* flight) {
+	char reservation_id[MAX_CMD_LEN];
+	Reservation *reservation, *tmp;
 	int passengers, b = FALSE;
 	ListNode *node, *prev;
 
-	scanf("%s", reserve_id);
+	scanf("%s", reservation_id);
 	scanf("%d", &passengers);
 
-	if (!isvalid_reserve_id(reserve_id)) {
-		printf(INVALID_RESERVE);
+	if (!isvalid_reservation_id(reservation_id)) {
+		printf(INVALID_RESERVATION);
 		return;
 	}
 
-	if (hashtable_contains(gbsystem.reserves_ids, reserve_id)) {
-		printf(RESERVE_ALREADY_EXISTS, reserve_id);
+	if (hashtable_contains(gbsystem.reservation_ids, reservation_id)) {
+		printf(RESERVATION_ALREADY_EXISTS, reservation_id);
 		return;
 	}
 
 	if (flight->taken_seats + passengers > flight->capacity) {
-		printf(TOO_MANY_RESERVES);
+		printf(TOO_MANY_RESERVATIONS);
 		return;
 	}
 
@@ -226,26 +226,26 @@ void add_reserve(Flight* flight) {
 		return;
 	}
 
-	reserve = custom_alloc(sizeof(Reserve));
-	reserve->id = custom_alloc(sizeof(char) * (strlen(reserve_id) + 1));
-	reserve->passengers = passengers;
-	strcpy(reserve->id, reserve_id);
-	reserve->flight = flight;
-	hashtable_add(gbsystem.reserves_ids, reserve);
+	reservation = custom_alloc(sizeof(Reservation));
+	reservation->id = custom_alloc(sizeof(char) * (strlen(reservation_id) + 1));
+	reservation->passengers = passengers;
+	strcpy(reservation->id, reservation_id);
+	reservation->flight = flight;
+	hashtable_add(gbsystem.reservation_ids, reservation);
 
 	/* Insert in list alphabetically */
-	for (node = flight->reserves.head, prev = NULL; node != NULL;
+	for (node = flight->reservations.head, prev = NULL; node != NULL;
 		 prev = node, node = node->next) {
-		tmp = (Reserve*)node->data;
-		if (strcmp(reserve->id, tmp->id) < 0) {
-			list_insert(&flight->reserves, reserve, prev);
+		tmp = (Reservation*)node->data;
+		if (strcmp(reservation->id, tmp->id) < 0) {
+			list_insert(&flight->reservations, reservation, prev);
 			b = TRUE;
 			break;
 		}
 	}
-	if (!b) list_add(&flight->reserves, reserve);
+	if (!b) list_add(&flight->reservations, reservation);
 
-	flight->taken_seats += reserve->passengers;
+	flight->taken_seats += reservation->passengers;
 
 	return;
 }
@@ -255,11 +255,11 @@ void add_reserve(Flight* flight) {
  -----------------------*/
 
 /* Deletes reservation or flight by id */
-void delete_reserve() {
+void delete_reservation() {
 	char id[MAX_CMD_LEN];
 	int i, t, found = FALSE;
 	List lf, *lr;
-	Reserve* r;
+	Reservation* r;
 	ListNode *node, *prev;
 	Flight* f;
 
@@ -275,16 +275,16 @@ void delete_reserve() {
 			free(node->data);
 		}
 		list_destroy(&lf);
-	} else if ((f = hashtable_get(gbsystem.reserves_ids, id)) != NULL) {
-		lr = &f->reserves;
+	} else if ((f = hashtable_get(gbsystem.reservation_ids, id)) != NULL) {
+		lr = &f->reservations;
 		found = TRUE;
 
 		for (node = lr->head, prev = NULL; node != NULL;
 			 prev = node, node = node->next) {
-			r = (Reserve*)node->data;
+			r = (Reservation*)node->data;
 			if ((t = strcmp(r->id, id)) == 0) {
 				f->taken_seats -= r->passengers;
-				hashtable_remove(gbsystem.reserves_ids, r);
+				hashtable_remove(gbsystem.reservation_ids, r);
 				list_remove(lr, node, prev);
 				break;
 			} else if (t > 0)
