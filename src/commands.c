@@ -257,7 +257,7 @@ void add_reservation(Flight* flight) {
 /* Deletes reservation or flight by id */
 void delete_reservation() {
 	char id[MAX_CMD_LEN];
-	int i, t, found = FALSE;
+	int i, found = FALSE;
 	List lf, *lr;
 	Reservation* r;
 	ListNode *node, *prev;
@@ -282,13 +282,12 @@ void delete_reservation() {
 		for (node = lr->head, prev = NULL; node != NULL;
 			 prev = node, node = node->next) {
 			r = (Reservation*)node->data;
-			if ((t = strcmp(r->id, id)) == 0) {
+			if (strcmp(r->id, id) == 0) {
 				f->taken_seats -= r->passengers;
 				hashtable_remove(gbsystem.reservation_ids, r);
 				list_remove(lr, node, prev);
 				break;
-			} else if (t > 0)
-				break;
+			}
 		}
 	}
 	if (!found) printf(NOT_FOUND);

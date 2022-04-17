@@ -80,6 +80,7 @@ int hashtable_contains(HashTable* ht, char* str) {
 	return FALSE;
 }
 
+/* Returns the flight which contains the reservation id */
 Flight* hashtable_get(HashTable* ht, char* id) {
 	int index = hash(id);
 	ListNode* node = ht->table[index].head;
