@@ -83,7 +83,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
-#define HASH_TABLE_SIZE 100
+#define HASH_TABLE_SIZE 20047
 
 typedef struct ListNode {
     void* data;

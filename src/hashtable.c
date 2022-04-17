@@ -1,17 +1,17 @@
 /* Implementation of HashTable for storing a list of strings */
 
-#include "proj1.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "proj1.h"
 
 int hash(char* v) {
-	unsigned i, l = strlen(v), sum = 0;
-	for (i = 1; i < l; i*=2)
-		sum += v[i];
-	return sum % HASH_TABLE_SIZE;
+	int h = 0, a = 127;
+	for (; *v != '\0'; v++) {
+		h = (a * h + *v) % HASH_TABLE_SIZE;
+	}
+	return h;
 }
 
 /* Creates a new HashTable */
@@ -20,8 +20,7 @@ HashTable* hashtable_create() {
 	HashTable* ht = custom_alloc(sizeof(HashTable));
 	ht->size = 0;
 
-	for (i = 0; i < HASH_TABLE_SIZE; i++)
-		list_init(&ht->table[i]);
+	for (i = 0; i < HASH_TABLE_SIZE; i++) list_init(&ht->table[i]);
 
 	return ht;
 }
