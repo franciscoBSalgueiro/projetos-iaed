@@ -40,6 +40,7 @@ void hashtable_destroy(HashTable* ht) {
 	free(ht);
 }
 
+/* Removes string from HashTable */
 void hashtable_remove(HashTable* ht, char* key) {
 	int index = hash(key);
 	ListNode* node = ht->table[index].head;
