@@ -98,7 +98,6 @@ typedef struct List {
 
 /* HashTable struct */
 typedef struct {
-	int size;
 	List table[HASH_TABLE_SIZE];
 } HashTable;
 

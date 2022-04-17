@@ -6,14 +6,6 @@
 
 #include "proj1.h"
 
-/* int hash(char* v) {
-	int h = 0, a = 127;
-	for (; *v != '\0'; v++) {
-		h = (a * h + *v) % HASH_TABLE_SIZE;
-	}
-	return h;
-} */
-
 int hash(char* v) {
 	int h, a = 31415, b = 27183;
 	for (h = 0; *v != '\0'; v++, a = a * b % (HASH_TABLE_SIZE - 1))
@@ -25,7 +17,6 @@ int hash(char* v) {
 HashTable* hashtable_create() {
 	int i;
 	HashTable* ht = custom_alloc(sizeof(HashTable));
-	ht->size = 0;
 
 	for (i = 0; i < HASH_TABLE_SIZE; i++) {
 		list_init(&ht->table[i]);
@@ -71,7 +62,6 @@ void hashtable_remove(HashTable* ht, Reserve* r) {
 void hashtable_add(HashTable* ht, Reserve* r) {
 	int index = hash(r->id);
 	list_add(&ht->table[index], r);
-	ht->size++;
 }
 
 /* Returns true if the HashTable contains the reserve with that id */
