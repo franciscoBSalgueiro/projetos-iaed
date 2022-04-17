@@ -25,10 +25,7 @@ void clear_memory() {
 	int i;
 	hashtable_destroy(gbsystem.reserves_ids);
 	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (&gbsystem.flights[i] != NULL &&
-			&gbsystem.flights[i].reserves != NULL) {
-			list_destroy(&gbsystem.flights[i].reserves);
-		}
+		list_destroy(&gbsystem.flights[i].reserves);
 	}
 }
 
@@ -80,10 +77,10 @@ void get_all_flights(List* l, char id[]) {
 int delete_flight(int index) {
 	int i;
 	Flight* flight = &gbsystem.flights[index];
-	ListNode* n;
+	ListNode *n;
 
 	for (n = flight->reserves.head; n != NULL; n = n->next) {
-		hashtable_remove(gbsystem.reserves_ids, ((Reserve*)n->data)->id);
+		hashtable_remove(gbsystem.reserves_ids, n->data);
 	}
 	list_destroy(&flight->reserves);
 

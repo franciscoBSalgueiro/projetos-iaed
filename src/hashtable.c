@@ -1,4 +1,4 @@
-/* Implementation of HashTable for storing a list of strings */
+/* Implementation of HashTable for storing a list of reservations */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,11 +6,18 @@
 
 #include "proj1.h"
 
-int hash(char* v) {
+/* int hash(char* v) {
 	int h = 0, a = 127;
 	for (; *v != '\0'; v++) {
 		h = (a * h + *v) % HASH_TABLE_SIZE;
 	}
+	return h;
+} */
+
+int hash(char* v) {
+	int h, a = 31415, b = 27183;
+	for (h = 0; *v != '\0'; v++, a = a * b % (HASH_TABLE_SIZE - 1))
+		h = (a * h + *v) % HASH_TABLE_SIZE;
 	return h;
 }
 
@@ -20,7 +27,9 @@ HashTable* hashtable_create() {
 	HashTable* ht = custom_alloc(sizeof(HashTable));
 	ht->size = 0;
 
-	for (i = 0; i < HASH_TABLE_SIZE; i++) list_init(&ht->table[i]);
+	for (i = 0; i < HASH_TABLE_SIZE; i++) {
+		list_init(&ht->table[i]);
+	}
 
 	return ht;
 }
@@ -32,6 +41,7 @@ void hashtable_destroy(HashTable* ht) {
 		ListNode* node = ht->table[i].head;
 		while (node != NULL) {
 			ListNode* next = node->next;
+			free(((Reserve*)node->data)->id);
 			free(node->data);
 			free(node);
 			node = next;
@@ -41,12 +51,14 @@ void hashtable_destroy(HashTable* ht) {
 }
 
 /* Removes string from HashTable */
-void hashtable_remove(HashTable* ht, char* key) {
-	int index = hash(key);
+void hashtable_remove(HashTable* ht, Reserve* r) {
+	int index = hash(r->id);
 	ListNode* node = ht->table[index].head;
 	ListNode* prev = NULL;
 	while (node != NULL) {
-		if (strcmp(node->data, key) == 0) {
+		if (node->data == r) {
+			free(((Reserve*)node->data)->id);
+			free(node->data);
 			list_remove(&ht->table[index], node, prev);
 			return;
 		}
@@ -56,20 +68,32 @@ void hashtable_remove(HashTable* ht, char* key) {
 }
 
 /* Adds a new string to the HashTable */
-void hashtable_add(HashTable* ht, char* str) {
-	int index = hash(str);
-	list_add(&ht->table[index], str);
+void hashtable_add(HashTable* ht, Reserve* r) {
+	int index = hash(r->id);
+	list_add(&ht->table[index], r);
 	ht->size++;
 }
 
-/* Returns true if the HashTable contains the string */
+/* Returns true if the HashTable contains the reserve with that id */
 int hashtable_contains(HashTable* ht, char* str) {
 	int index = hash(str);
 	ListNode* node = ht->table[index].head;
 
 	while (node != NULL) {
-		if (strcmp(node->data, str) == 0) return TRUE;
+		if (strcmp(((Reserve*)node->data)->id, str) == 0) return TRUE;
 		node = node->next;
 	}
 	return FALSE;
+}
+
+Flight* hashtable_get(HashTable* ht, char* id) {
+	int index = hash(id);
+	ListNode* node = ht->table[index].head;
+
+	while (node != NULL) {
+		if (strcmp(((Reserve*)node->data)->id, id) == 0)
+			return ((Reserve*)node->data)->flight;
+		node = node->next;
+	}
+	return NULL;
 }

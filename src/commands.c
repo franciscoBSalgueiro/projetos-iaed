@@ -230,7 +230,8 @@ void add_reserve(Flight* flight) {
 	reserve->id = custom_alloc(sizeof(char) * (strlen(reserve_id) + 1));
 	reserve->passengers = passengers;
 	strcpy(reserve->id, reserve_id);
-	hashtable_add(gbsystem.reserves_ids, reserve->id);
+	reserve->flight = flight;
+	hashtable_add(gbsystem.reserves_ids, reserve);
 
 	/* Insert in list alphabetically */
 	for (node = flight->reserves.head, prev = NULL; node != NULL;
@@ -260,6 +261,7 @@ void delete_reserve() {
 	List lf, *lr;
 	Reserve* r;
 	ListNode *node, *prev;
+	Flight* f;
 
 	scanf("%s", id);
 
@@ -270,24 +272,23 @@ void delete_reserve() {
 		for (node = lf.head; node != NULL; node = node->next, i++) {
 			found = TRUE;
 			delete_flight(*(int*)node->data - i);
+			free(node->data);
 		}
 		list_destroy(&lf);
-	} else if (hashtable_contains(gbsystem.reserves_ids, id)  ){
-		for (i = 0; i < gbsystem.flights_count; i++) {
-			lr = &gbsystem.flights[i].reserves;
-			for (node = lr->head, prev = NULL; node != NULL;
-				 prev = node, node = node->next) {
-				r = (Reserve*)node->data;
-				if ((t = strcmp(r->id, id)) == 0) {
-					found = TRUE;
-					gbsystem.flights[i].taken_seats -= r->passengers;
-					hashtable_remove(gbsystem.reserves_ids, r->id);
-					list_remove(lr, node, prev);
-					break;
-				} else if (t > 0)
-					break;
-			}
-			if (found) break;
+	} else if ((f = hashtable_get(gbsystem.reserves_ids, id)) != NULL) {
+		lr = &f->reserves;
+		found = TRUE;
+
+		for (node = lr->head, prev = NULL; node != NULL;
+			 prev = node, node = node->next) {
+			r = (Reserve*)node->data;
+			if ((t = strcmp(r->id, id)) == 0) {
+				f->taken_seats -= r->passengers;
+				hashtable_remove(gbsystem.reserves_ids, r);
+				list_remove(lr, node, prev);
+				break;
+			} else if (t > 0)
+				break;
 		}
 	}
 	if (!found) printf(NOT_FOUND);

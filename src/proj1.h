@@ -141,6 +141,7 @@ typedef struct {
 typedef struct {
 	char* id;
 	int passengers;
+	Flight* flight;
 } Reserve;
 
 /*----------------------
@@ -264,6 +265,7 @@ void list_destroy(List* list);
 int hash(char* v);
 HashTable* hashtable_create();
 void hashtable_destroy(HashTable* ht);
-void hashtable_remove(HashTable* ht, char* key);
-void hashtable_add(HashTable* ht, char* str);
+void hashtable_remove(HashTable* ht, Reserve* r);
+void hashtable_add(HashTable* ht, Reserve* r);
 int hashtable_contains(HashTable* ht, char* str);
+Flight* hashtable_get(HashTable* ht, char* id);

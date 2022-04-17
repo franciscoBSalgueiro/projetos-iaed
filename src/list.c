@@ -51,7 +51,7 @@ void list_remove(List* list, ListNode* node, ListNode* prev) {
 	}
 
 	list->size--;
-	free(node->data);
+	/* free(node->data); */
 	free(node);
 }
 
@@ -76,7 +76,6 @@ void list_destroy(List* list) {
 
 	while (node != NULL) {
 		next = node->next;
-		free(node->data);
 		free(node);
 		node = next;
 	}
