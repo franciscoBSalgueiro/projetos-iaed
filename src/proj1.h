@@ -83,6 +83,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
+#define HASH_TABLE_SIZE 100
 
 typedef struct ListNode {
     void* data;
@@ -94,6 +95,12 @@ typedef struct List {
     ListNode* tail;
     int size;
 } List;
+
+/* HashTable struct */
+typedef struct {
+	int size;
+	List table[HASH_TABLE_SIZE];
+} HashTable;
 
 /* Airport struct */
 typedef struct {
@@ -130,7 +137,7 @@ typedef struct {
 	int taken_seats;
 } Flight;
 
-/* Time struct */
+/* Reservation struct */
 typedef struct {
 	char* id;
 	int passengers;
@@ -154,6 +161,9 @@ typedef struct {
 
 	/* Flag to avoid sorting if no changes were made to the arrays */
 	int is_dep_sorted, is_arr_sorted;
+
+	/* Hash table for reservations */
+	HashTable* reserves_ids;
 
 	/* Current system date */
 	Date date;
@@ -193,7 +203,6 @@ int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
 int isvalid_reserve_id(char* id);
-int res_id_already_exists(char reserve_id[]);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -224,7 +233,7 @@ void print_reserve(Reserve* reserve);
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
 
-void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
+void insertion_sort(int* is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 					Time* (*time_key)(Flight*));
 void sort_arrivals();
 void sort_departures();
@@ -241,11 +250,20 @@ int is_upper(char s);
 int is_digit(char s);
 
 void* custom_alloc(long unsigned int size);
-void clear_reserves();
+void clear_memory();
 
+/* list.c */
 void list_init(List* list);
 void list_add(List* list, void* data);
-void list_insert(List* list, void* data, int index);
-void list_remove(List* list, int index);
+void list_insert(List* list, void* data, ListNode* node);
+void list_remove(List* list, ListNode* node, ListNode* prev);
 void* list_get(List* list, int index);
 void list_destroy(List* list);
+
+/* hashtable.c */
+int hash(char* v);
+HashTable* hashtable_create();
+void hashtable_destroy(HashTable* ht);
+void hashtable_remove(HashTable* ht, char* key);
+void hashtable_add(HashTable* ht, char* str);
+int hashtable_contains(HashTable* ht, char* str);

@@ -15,23 +15,23 @@ void* custom_alloc(long unsigned int size) {
 	void* ptr = malloc(size);
 	if (!ptr) {
 		printf("No memory\n");
-		clear_reserves();
+		clear_memory();
 		exit(1);
 	}
 	return ptr;
 }
 
-void clear_reserves() {
-	int i, j;
-	Reserve* r;
-
+void clear_memory() {
+	int i/* , j */;
+	/* Reserve* r; */
+	hashtable_destroy(gbsystem.reserves_ids);
 	for (i = 0; i < gbsystem.flights_count; i++) {
 		if (&gbsystem.flights[i] != NULL &&
 			&gbsystem.flights[i].reserves != NULL) {
-			for (j = 0; j < gbsystem.flights[i].reserves.size; j++) {
+			/* for (j = 0; j < gbsystem.flights[i].reserves.size; j++) {
 				r = (Reserve*)list_get(&gbsystem.flights[i].reserves, j);
 				free(r->id);
-			}
+			} */
 			list_destroy(&gbsystem.flights[i].reserves);
 		}
 	}
@@ -88,7 +88,7 @@ int delete_flight(int index) {
 	ListNode* n;
 
 	for (n = flight->reserves.head; n != NULL; n = n->next) {
-		free(((Reserve*)n->data)->id);
+		hashtable_remove(gbsystem.reserves_ids, ((Reserve*)n->data)->id);
 	}
 	list_destroy(&flight->reserves);
 
@@ -96,10 +96,10 @@ int delete_flight(int index) {
 
 	/* Remove flight from lists */
 	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.dep_flights[i] == flight && i < gbsystem.flights_count)
+		if (gbsystem.dep_flights[i] == flight)
 			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
 				   (gbsystem.flights_count - i) * sizeof(Flight*));
-		if (gbsystem.arr_flights[i] == flight && i < gbsystem.flights_count)
+		if (gbsystem.arr_flights[i] == flight)
 			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
 				   (gbsystem.flights_count - i) * sizeof(Flight*));
 	}
@@ -160,25 +160,8 @@ int isvalid_reserve_id(char* id) {
 	return TRUE;
 }
 
-/* Checks if reservation id was already used */
-int res_id_already_exists(char reserve_id[]) {
-	int i, j;
-	List* l;
-	Reserve* r;
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		l = &gbsystem.flights[i].reserves;
-		for (j = 0; j < l->size; j++) {
-			r = (Reserve*)list_get(l, j);
-			if (strcmp(r->id, reserve_id) == 0) {
-				return TRUE;
-			}
-		}
-	}
-	return FALSE;
-}
-
 /*--------------------------
- |  INTIALIAZING FUNCTIONS	|
+ |  INITIALIZING FUNCTIONS	|
  ---------------------------*/
 
 /* Initializes values for the Time struct */
@@ -433,14 +416,14 @@ int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
  -----------------------*/
 
 /* Sorts flights by departure or arrival date and time */
-void insertion_sort(int is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
+void insertion_sort(int* is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 					Time* (*time_key)(Flight*)) {
 	int i, j;
 	Flight* temp;
 
 	/* If already sorted doesn't do anything */
-	if (is_sorted) return;
-	is_sorted = TRUE;
+	if (*is_sorted) return;
+	*is_sorted = TRUE;
 
 	for (i = 1; i < gbsystem.flights_count; i++) {
 		temp = arr[i];

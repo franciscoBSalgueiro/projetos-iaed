@@ -27,40 +27,22 @@ void list_add(List* list, void* data) {
 	list->size++;
 }
 
-void list_insert(List* list, void* data, int index) {
-	int i;
-	ListNode *prev, *node = custom_alloc(sizeof(ListNode));
-	node->data = data;
-
-	if (index == 0) {
-		node->next = list->head;
-		list->head = node;
+void list_insert(List* list, void* data, ListNode* node) {
+	ListNode *new_node = custom_alloc(sizeof(ListNode));
+	new_node->data = data;
+	if (node == NULL) {
+		new_node->next = list->head;
+		list->head = new_node;
 	} else {
-		prev = list->head;
-		for (i = 0; i < index - 1; i++) {
-			prev = prev->next;
-		}
-		node->next = prev->next;
-		prev->next = node;
+		new_node->next = node->next;
+		node->next = new_node;
 	}
 
 	list->size++;
 }
 
-void list_remove(List* list, int index) {
-	ListNode* node = list->head;
-	ListNode* prev = NULL;
-	int i = 0;
-
-	if (index < 0 || index >= list->size) {
-		return;
-	}
-
-	while (i < index) {
-		prev = node;
-		node = node->next;
-		i++;
-	}
+void list_remove(List* list, ListNode* node, ListNode* prev) {
+	if (node == NULL) return;
 
 	if (prev == NULL) {
 		list->head = node->next;
@@ -68,9 +50,9 @@ void list_remove(List* list, int index) {
 		prev->next = node->next;
 	}
 
+	list->size--;
 	free(node->data);
 	free(node);
-	list->size--;
 }
 
 void* list_get(List* list, int index) {

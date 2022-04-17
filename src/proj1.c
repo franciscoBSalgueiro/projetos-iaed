@@ -22,12 +22,14 @@ int main() {
 	gbsystem.is_arr_sorted = FALSE;
 	init_date(&gbsystem.date, INITIAL_DATE);
 
+	gbsystem.reserves_ids = hashtable_create();
+
 	/* Continues until the user enters the command 'q' */
 	while (cmd_triage()) {
 	}
 
-	/* free all reserves from flights */
-	clear_reserves();
+	/* free all used memory */
+	clear_memory();
 	return 0;
 }
 
