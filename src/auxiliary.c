@@ -63,17 +63,6 @@ int get_flight(char id[], Date* date) {
 	return -1;
 }
 
-void get_all_flights(List* l, char id[]) {
-	int i, *data;
-
-	for (i = 0; i < gbsystem.flights_count; i++)
-		if (strcmp(gbsystem.flights[i].id, id) == 0) {
-			data = custom_alloc(sizeof(int));
-			*data = i;
-			list_add(l, data);
-		}
-}
-
 int delete_flight(int index) {
 	int i;
 	Flight* flight = &gbsystem.flights[index];
@@ -88,12 +77,19 @@ int delete_flight(int index) {
 
 	/* Remove flight from lists */
 	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.dep_flights[i] == flight)
+		if (gbsystem.dep_flights[i] == flight) {
 			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
 				   (gbsystem.flights_count - i) * sizeof(Flight*));
-		if (gbsystem.arr_flights[i] == flight)
+			break;
+		}
+	}
+
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		if (gbsystem.arr_flights[i] == flight) {
 			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
 				   (gbsystem.flights_count - i) * sizeof(Flight*));
+			break;
+		}
 	}
 
 	if (index < gbsystem.flights_count) {
@@ -104,14 +100,22 @@ int delete_flight(int index) {
 	return 0;
 }
 
+int cmp_reservation_id(void* id1, void* id2) {
+	return strcmp((char*)id1, (char*)id2);
+}
+
+/* Lists all the reservations from a flight */
 void list_flight_reservations(Flight* flight) {
-	int i, l = flight->reservations.size;
+	ListNode* n;
 	if (!isvalid_date(&flight->dep_date)) {
 		printf(INVALID_DATE);
 		return;
 	}
-	for (i = 0; i < l; i++) {
-		print_reservations((Reservation*)list_get(&flight->reservations, i));
+
+	list_sort(&flight->reservations);
+
+	for(n = flight->reservations.head; n != NULL; n = n->next) {
+		print_reservation((Reservation*)n->data);
 	}
 }
 
@@ -363,7 +367,7 @@ void print_time(Time* time) {
 	printf(OUT_TIME_FORMAT, time->hours, time->minutes);
 }
 
-void print_reservations(Reservation* reservation) {
+void print_reservation(Reservation* reservation) {
 	printf(RESERVATION_STRING, reservation->id, reservation->passengers);
 }
 

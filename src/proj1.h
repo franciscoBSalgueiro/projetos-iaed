@@ -93,7 +93,6 @@ typedef struct ListNode {
 typedef struct List {
 	ListNode* head;
 	ListNode* tail;
-	int size;
 } List;
 
 /* HashTable struct */
@@ -189,6 +188,7 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				  Time* (*time_key)(Flight*));
 void change_date();
+int cmp_reservation_id(void* id1, void* id2);
 void list_reservations();
 void add_reservation(Flight* flight);
 void delete_reservation();
@@ -196,7 +196,6 @@ void delete_reservation();
 /* auxiliary.c */
 int get_airport(char id[]);
 int get_flight(char id[], Date* date);
-void get_all_flights(List* l, char id[]);
 int delete_flight(int index);
 void list_flight_reservations(Flight* flight);
 int get_num_flights(char* id);
@@ -228,7 +227,7 @@ void print_flight(char* id, char* airport_id, Date* date, Time* time);
 void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
-void print_reservations(Reservation* reservation);
+void print_reservation(Reservation* reservation);
 
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
@@ -257,8 +256,8 @@ void list_init(List* list);
 void list_add(List* list, void* data);
 void list_insert(List* list, void* data, ListNode* node);
 void list_remove(List* list, ListNode* node, ListNode* prev);
-void* list_get(List* list, int index);
 void list_destroy(List* list);
+void list_sort(List* list);
 
 /* hashtable.c */
 int hash(char* v);

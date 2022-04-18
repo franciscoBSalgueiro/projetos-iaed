@@ -194,9 +194,9 @@ void list_reservations() {
 /* Adds a new reservation to the flight */
 void add_reservation(Flight* flight) {
 	char reservation_id[MAX_CMD_LEN];
-	Reservation *reservation, *tmp;
-	int passengers, b = FALSE;
-	ListNode *node, *prev;
+	Reservation *reservation/* , *tmp */;
+	int passengers/* , b = FALSE */;
+	/* ListNode *node, *prev; */
 
 	scanf("%s", reservation_id);
 	scanf("%d", &passengers);
@@ -231,19 +231,9 @@ void add_reservation(Flight* flight) {
 	reservation->passengers = passengers;
 	strcpy(reservation->id, reservation_id);
 	reservation->flight = flight;
-	hashtable_add(gbsystem.reservation_ids, reservation);
 
-	/* Insert in list alphabetically */
-	for (node = flight->reservations.head, prev = NULL; node != NULL;
-		 prev = node, node = node->next) {
-		tmp = (Reservation*)node->data;
-		if (strcmp(reservation->id, tmp->id) < 0) {
-			list_insert(&flight->reservations, reservation, prev);
-			b = TRUE;
-			break;
-		}
-	}
-	if (!b) list_add(&flight->reservations, reservation);
+	hashtable_add(gbsystem.reservation_ids, reservation);
+	list_insert(&flight->reservations, reservation, NULL);
 
 	flight->taken_seats += reservation->passengers;
 
@@ -258,7 +248,7 @@ void add_reservation(Flight* flight) {
 void delete_reservation() {
 	char id[MAX_CMD_LEN];
 	int i, found = FALSE;
-	List lf, *lr;
+	List /* lf,  */*lr;
 	Reservation* r;
 	ListNode *node, *prev;
 	Flight* f;
@@ -266,15 +256,13 @@ void delete_reservation() {
 	scanf("%s", id);
 
 	if (strlen(id) < 10) {
-		list_init(&lf);
-		get_all_flights(&lf, id);
-		i = 0;
-		for (node = lf.head; node != NULL; node = node->next, i++) {
-			found = TRUE;
-			delete_flight(*(int*)node->data - i);
-			free(node->data);
+		for(i = 0; i < gbsystem.flights_count; i++) {
+			if (strncmp(gbsystem.flights[i].id, id, 10) == 0) {
+				found = TRUE;
+				delete_flight(i);
+				i--;
+			}
 		}
-		list_destroy(&lf);
 	} else if ((f = hashtable_get(gbsystem.reservation_ids, id)) != NULL) {
 		lr = &f->reservations;
 		found = TRUE;

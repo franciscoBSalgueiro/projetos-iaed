@@ -5,13 +5,14 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "proj1.h"
 
 void list_init(List* list) {
 	list->head = NULL;
 	list->tail = NULL;
-	list->size = 0;
 }
 
 void list_add(List* list, void* data) {
@@ -29,8 +30,6 @@ void list_add(List* list, void* data) {
 		list->tail->next = node;
 		list->tail = node;
 	}
-
-	list->size++;
 }
 
 void list_insert(List* list, void* data, ListNode* node) {
@@ -43,35 +42,17 @@ void list_insert(List* list, void* data, ListNode* node) {
 		new_node->next = node->next;
 		node->next = new_node;
 	}
-
-	list->size++;
 }
 
 void list_remove(List* list, ListNode* node, ListNode* prev) {
 	if (node == NULL) return;
 
-	if (prev == NULL) {
+	if (prev == NULL)
 		list->head = node->next;
-	} else {
+	else
 		prev->next = node->next;
-	}
 
-	list->size--;
 	free(node);
-}
-
-void* list_get(List* list, int index) {
-	ListNode* node = list->head;
-	int i = 0;
-
-	while (node != NULL) {
-		if (i == index) return node->data;
-
-		node = node->next;
-		i++;
-	}
-
-	return NULL;
 }
 
 void list_destroy(List* list) {
@@ -83,8 +64,30 @@ void list_destroy(List* list) {
 		free(node);
 		node = next;
 	}
+}
 
-	list->head = NULL;
-	list->tail = NULL;
-	list->size = 0;
+/* Sort a list of Reservations alphabetically */
+void list_sort(List* list) {
+	ListNode* node, *next, *prev;
+	int ended = FALSE;
+
+	while (!ended) {
+		ended = TRUE;
+		for(prev = NULL, node = list->head; node != NULL; prev = node, node = next) {
+			next = node->next;
+			if (next != NULL && strcmp(((Reservation*)node->data)->id,
+				((Reservation*)next->data)->id) > 0) {
+				ended = FALSE;
+				node->next = next->next;
+				
+				next->next = node;
+				if (prev == NULL)
+					list->head = next;
+				else
+					prev->next = next;
+				if(next == list->tail)
+					list->tail = node;
+			}
+		}
+	}
 }
