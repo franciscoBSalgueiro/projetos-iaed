@@ -18,7 +18,7 @@ int hash(char* v) {
 }
 
 /* Creates a new HashTable */
-HashTable* hashtable_create(char* (*ht_key)(void*)) {
+HashTable* hashtable_create(char* (*ht_key)(void*), int free_mem) {
 	int i;
 	HashTable* ht = custom_alloc(sizeof(HashTable));
 
@@ -27,6 +27,7 @@ HashTable* hashtable_create(char* (*ht_key)(void*)) {
 	}
 
 	ht->key = ht_key;
+	ht->free_mem = free_mem;
 
 	return ht;
 }
@@ -39,8 +40,10 @@ void hashtable_destroy(HashTable* ht) {
 		ListNode* node = ht->table[i].head;
 		while (node != NULL) {
 			ListNode* next = node->next;
-			free(ht->key(node->data));
-			free(node->data);
+			if (ht->free_mem) {
+				free(ht->key(node->data));
+				free(node->data);
+			}
 			free(node);
 			node = next;
 		}
@@ -55,8 +58,10 @@ void hashtable_remove(HashTable* ht, void* data) {
 	ListNode* prev = NULL;
 	while (node != NULL) {
 		if (node->data == data) {
-			free(ht->key(node->data));
-			free(node->data);
+			if(ht->free_mem) {
+				free(ht->key(node->data));
+				free(node->data);
+			}
 			list_remove(&ht->table[index], node, prev);
 			return;
 		}
@@ -81,6 +86,17 @@ int hashtable_contains(HashTable* ht, char* str) {
 		node = node->next;
 	}
 	return FALSE;
+}
+
+Flight* hashtable_get_flight(HashTable* ht, char* str, Date* date) {
+	int index = hash(str);
+	ListNode* node = ht->table[index].head;
+
+	while (node != NULL) {
+		if (strcmp(ht->key(node->data), str) == 0 && cmp_date(&((Flight*)(node->data))->dep_date, date) == 0 ) return node->data;
+		node = node->next;
+	}
+	return NULL;
 }
 
 /* Returns the flight which contains the reservation id */

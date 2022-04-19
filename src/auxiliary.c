@@ -14,8 +14,7 @@
 void* custom_alloc(long unsigned int size) {
 	void* ptr = malloc(size);
 	if (!ptr) {
-		printf("No memory\n");
-		clear_memory();
+		printf(NO_MEMORY);
 		exit(1);
 	}
 	return ptr;
@@ -23,7 +22,8 @@ void* custom_alloc(long unsigned int size) {
 
 void clear_memory() {
 	int i;
-	hashtable_destroy(gbsystem.reservation_ids);
+	hashtable_destroy(gbsystem.reservation_ht);
+	hashtable_destroy(gbsystem.flight_ht);
 	for (i = 0; i < gbsystem.flights_count; i++) {
 		list_destroy(&gbsystem.flights[i].reservations);
 	}
@@ -52,16 +52,6 @@ int get_airport(char id[]) {
 	return -left - 1;
 }
 
-/* returns index of flight or -1 if it doesn't exist */
-int get_flight(char id[], Date* date) {
-	int i;
-	for (i = 0; i < gbsystem.flights_count; i++)
-		if (strcmp(gbsystem.flights[i].id, id) == 0 &&
-			cmp_date(&gbsystem.flights[i].dep_date, date) == 0) {
-			return i;
-		}
-	return -1;
-}
 
 /* Remove flight from lists */
 int delete_flight(int index) {
@@ -69,8 +59,9 @@ int delete_flight(int index) {
 	Flight* flight = &gbsystem.flights[index];
 	ListNode* n;
 
+	hashtable_remove(gbsystem.flight_ht, flight);
 	for (n = flight->reservations.head; n != NULL; n = n->next) {
-		hashtable_remove(gbsystem.reservation_ids, n->data);
+		hashtable_remove(gbsystem.reservation_ht, n->data);
 	}
 	list_destroy(&flight->reservations);
 
@@ -139,13 +130,12 @@ int isvalid_flight_id(char* id) {
 
 /* Checks if there are no lowercase letters in the id */
 int isvalid_airport_id(char* id) {
-	unsigned int i, l = strlen(id);
-	for (i = 0; i < l; i++)
-		if (is_lower(id[i])) return FALSE;
+	for (; *id != '\0' ; id++)
+		if (is_lower(*id)) return FALSE;
 	return TRUE;
 }
 
-/* Checks if string is longer than 10 char and
+/* Checks if string is at least 10 char and
  * contains only digits or uppercase letters */
 int isvalid_reservation_id(char* id) {
 	unsigned int i, l;
@@ -382,7 +372,7 @@ int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 
 	if (!isvalid_flight_id(flight_id)) return printf(INVALID_FLIGHT);
 
-	if (get_flight(flight_id, dep_date) >= 0)
+	if (hashtable_get_flight(gbsystem.flight_ht, flight_id, dep_date) != NULL)
 		return printf(FLIGHT_ALREADY_EXISTS);
 
 	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0)

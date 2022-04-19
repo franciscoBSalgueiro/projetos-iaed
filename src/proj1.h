@@ -63,6 +63,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define FLIGHT_ALREADY_EXISTS "flight already exists\n"
 #define RESERVATION_ALREADY_EXISTS "%s: flight reservation already used\n"
 #define NOT_FOUND "not found\n"
+#define NO_MEMORY "No memory.\n"
 
 /* MESSAGES */
 #define AIRPORT_STRING "%s %s %s %d\n"
@@ -83,7 +84,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
-#define HASH_TABLE_SIZE 39877
+#define HASH_TABLE_SIZE 9949
 
 typedef struct ListNode {
 	void* data;
@@ -99,6 +100,7 @@ typedef struct List {
 typedef struct {
 	List table[HASH_TABLE_SIZE];
 	char* (*key)(void*);
+	int free_mem;
 } HashTable;
 
 /* Airport struct */
@@ -163,8 +165,8 @@ typedef struct {
 	int is_dep_sorted, is_arr_sorted;
 
 	/* Hash table for reservations */
-	HashTable* reservation_ids;
-	HashTable* flight_ids;
+	HashTable* reservation_ht;
+	HashTable* flight_ht;
 
 	/* Current system date */
 	Date date;
@@ -197,7 +199,6 @@ void delete_reservation();
 
 /* auxiliary.c */
 int get_airport(char id[]);
-int get_flight(char id[], Date* date);
 int delete_flight(int index);
 void list_flight_reservations(Flight* flight);
 int get_num_flights(char* id);
@@ -265,9 +266,10 @@ void list_sort(List* list);
 
 /* hashtable.c */
 int hash(char* v);
-HashTable* hashtable_create(char* (*ht_key)(void*));
+HashTable* hashtable_create(char* (*ht_key)(void*), int free_mem);
 void hashtable_destroy(HashTable* ht);
 void hashtable_remove(HashTable* ht, void* data);
 void hashtable_add(HashTable* ht, void* data);
 int hashtable_contains(HashTable* ht, char* str);
+Flight* hashtable_get_flight(HashTable* ht, char* str, Date* date);
 Flight* hashtable_get(HashTable* ht, char* id);

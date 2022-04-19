@@ -5,7 +5,7 @@ run : build
 	./$(FILE).out
 
 test: build
-	# ./test.sh ./$(FILE).out ./tests/p1-mooshak-tests
+	./test.sh ./$(FILE).out ./tests/p1-mooshak-tests
 	./test.sh ./$(FILE).out ./tests/tests
 	./test.sh ./$(FILE).out ./tests/community_tests
 	./test.sh ./$(FILE).out ./tests/custom_tests
