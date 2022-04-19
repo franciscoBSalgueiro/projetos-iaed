@@ -11,16 +11,19 @@
 
 #include "proj1.h"
 
+/* Allocates memory and ends program with error code if no more memory is
+ * available */
 void* custom_alloc(long unsigned int size) {
 	void* ptr = malloc(size);
 	if (!ptr) {
-		printf("No memory\n");
+		printf(NO_MEMORY);
 		clear_memory();
 		exit(1);
 	}
 	return ptr;
 }
 
+/* Frees all allocated memory */
 void clear_memory() {
 	int i;
 	hashtable_destroy(gbsystem.reservation_ids);
@@ -114,7 +117,7 @@ void list_flight_reservations(Flight* flight) {
 
 	list_sort(&flight->reservations);
 
-	for(n = flight->reservations.head; n != NULL; n = n->next) {
+	for (n = flight->reservations.head; n != NULL; n = n->next) {
 		print_reservation((Reservation*)n->data);
 	}
 }
@@ -436,7 +439,6 @@ Date* arr_date_key(Flight* flight) { return &flight->arr_date; }
 Time* dep_time_key(Flight* flight) { return &flight->dep_time; }
 Time* arr_time_key(Flight* flight) { return &flight->arr_time; }
 char* res_key(void* data) { return ((Reservation*)data)->id; }
-char* flight_key(void* data) { return ((Flight*)data)->id; }
 
 /*----------------------
  |       C TYPES      	|

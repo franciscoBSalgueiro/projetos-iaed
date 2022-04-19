@@ -63,6 +63,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 #define FLIGHT_ALREADY_EXISTS "flight already exists\n"
 #define RESERVATION_ALREADY_EXISTS "%s: flight reservation already used\n"
 #define NOT_FOUND "not found\n"
+#define NO_MEMORY "No memory.\n"
 
 /* MESSAGES */
 #define AIRPORT_STRING "%s %s %s %d\n"
@@ -204,8 +205,6 @@ int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
 int isvalid_reservation_id(char* id);
-char* res_key(void* data);
-char* flight_key(void* data);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -247,6 +246,7 @@ Date* dep_date_key(Flight* flight);
 Date* arr_date_key(Flight* flight);
 Time* dep_time_key(Flight* flight);
 Time* arr_time_key(Flight* flight);
+char* res_key(void* data);
 
 int is_lower(char s);
 int is_upper(char s);
