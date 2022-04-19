@@ -83,7 +83,7 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
-#define HASH_TABLE_SIZE 20047
+#define HASH_TABLE_SIZE 39877
 
 typedef struct ListNode {
 	void* data;
@@ -98,6 +98,7 @@ typedef struct List {
 /* HashTable struct */
 typedef struct {
 	List table[HASH_TABLE_SIZE];
+	char* (*key)(void*);
 } HashTable;
 
 /* Airport struct */
@@ -163,6 +164,7 @@ typedef struct {
 
 	/* Hash table for reservations */
 	HashTable* reservation_ids;
+	HashTable* flight_ids;
 
 	/* Current system date */
 	Date date;
@@ -202,6 +204,8 @@ int get_num_flights(char* id);
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
 int isvalid_reservation_id(char* id);
+char* res_key(void* data);
+char* flight_key(void* data);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -261,9 +265,9 @@ void list_sort(List* list);
 
 /* hashtable.c */
 int hash(char* v);
-HashTable* hashtable_create();
+HashTable* hashtable_create(char* (*ht_key)(void*));
 void hashtable_destroy(HashTable* ht);
-void hashtable_remove(HashTable* ht, Reservation* r);
-void hashtable_add(HashTable* ht, Reservation* r);
+void hashtable_remove(HashTable* ht, void* data);
+void hashtable_add(HashTable* ht, void* data);
 int hashtable_contains(HashTable* ht, char* str);
 Flight* hashtable_get(HashTable* ht, char* id);

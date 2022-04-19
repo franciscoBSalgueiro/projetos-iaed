@@ -14,7 +14,6 @@ System gbsystem;
 
 /* Initializes the system and waits for user commands */
 int main() {
-
 	/* System initialization with initial values */
 	gbsystem.airports_count = 0;
 	gbsystem.flights_count = 0;
@@ -22,7 +21,8 @@ int main() {
 	gbsystem.is_arr_sorted = FALSE;
 	init_date(&gbsystem.date, INITIAL_DATE);
 
-	gbsystem.reservation_ids = hashtable_create();
+	gbsystem.reservation_ids = hashtable_create(res_key);
+	gbsystem.flight_ids = hashtable_create(flight_key);
 
 	/* Continues until the user enters the command 'q' */
 	while (cmd_triage()) {

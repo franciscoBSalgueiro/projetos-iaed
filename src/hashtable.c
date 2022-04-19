@@ -18,7 +18,7 @@ int hash(char* v) {
 }
 
 /* Creates a new HashTable */
-HashTable* hashtable_create() {
+HashTable* hashtable_create(char* (*ht_key)(void*)) {
 	int i;
 	HashTable* ht = custom_alloc(sizeof(HashTable));
 
@@ -26,8 +26,11 @@ HashTable* hashtable_create() {
 		list_init(&ht->table[i]);
 	}
 
+	ht->key = ht_key;
+
 	return ht;
 }
+
 
 /* Destroys a HashTable */
 void hashtable_destroy(HashTable* ht) {
@@ -36,7 +39,7 @@ void hashtable_destroy(HashTable* ht) {
 		ListNode* node = ht->table[i].head;
 		while (node != NULL) {
 			ListNode* next = node->next;
-			free(((Reservation*)node->data)->id);
+			free(ht->key(node->data));
 			free(node->data);
 			free(node);
 			node = next;
@@ -46,13 +49,13 @@ void hashtable_destroy(HashTable* ht) {
 }
 
 /* Removes string from HashTable */
-void hashtable_remove(HashTable* ht, Reservation* r) {
-	int index = hash(r->id);
+void hashtable_remove(HashTable* ht, void* data) {
+	int index = hash(ht->key(data));
 	ListNode* node = ht->table[index].head;
 	ListNode* prev = NULL;
 	while (node != NULL) {
-		if (node->data == r) {
-			free(((Reservation*)node->data)->id);
+		if (node->data == data) {
+			free(ht->key(node->data));
 			free(node->data);
 			list_remove(&ht->table[index], node, prev);
 			return;
@@ -63,9 +66,9 @@ void hashtable_remove(HashTable* ht, Reservation* r) {
 }
 
 /* Adds a new string to the HashTable */
-void hashtable_add(HashTable* ht, Reservation* r) {
-	int index = hash(r->id);
-	list_add(&ht->table[index], r);
+void hashtable_add(HashTable* ht, void* data) {
+	int index = hash(ht->key(data));
+	list_add(&ht->table[index], data);
 }
 
 /* Returns true if the HashTable contains the reservation with that id */
@@ -74,7 +77,7 @@ int hashtable_contains(HashTable* ht, char* str) {
 	ListNode* node = ht->table[index].head;
 
 	while (node != NULL) {
-		if (strcmp(((Reservation*)node->data)->id, str) == 0) return TRUE;
+		if (strcmp(ht->key(node->data), str) == 0) return TRUE;
 		node = node->next;
 	}
 	return FALSE;

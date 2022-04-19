@@ -23,7 +23,6 @@ void add_airport() {
 
 	scanf(IN_AIRPORT_FORMAT, airport_id, country, city);
 
-	/* Error checks */
 	if (!isvalid_airport_id(airport_id)) {
 		printf(INVALID_AIRPORT_ID);
 		return;
@@ -37,9 +36,8 @@ void add_airport() {
 		return;
 	}
 
-	ins_index = -(ins_index + 1); /* Convert index to positive */
+	ins_index = -(ins_index + 1);
 
-	/* Inserts the airport in the correct position alphabetically */
 	memmove(&gbsystem.airports[ins_index + 1], &gbsystem.airports[ins_index],
 			(gbsystem.airports_count - ins_index) * sizeof(Airport));
 	init_airport(&gbsystem.airports[ins_index], airport_id, country, city);
@@ -69,7 +67,7 @@ void list_airports() {
 		}
 		print_airport(&gbsystem.airports[i]);
 	}
-	if (!has_argument) /* Only prints all airports if no argument is given */
+	if (!has_argument)
 		for (i = 0; i < gbsystem.airports_count; i++)
 			print_airport(&gbsystem.airports[i]);
 }
@@ -90,7 +88,6 @@ void add_flight() {
 	gbsystem.dep_flights[gbsystem.flights_count] = new_flight;
 	gbsystem.flights_count++;
 
-	/* Resets flags as the array may no longer be sorted */
 	gbsystem.is_dep_sorted = FALSE;
 	gbsystem.is_arr_sorted = FALSE;
 }
@@ -137,7 +134,6 @@ void list_flights(Flight* array[], char* (*airport_key_in)(Flight*),
 	}
 
 	for (i = 0; i < gbsystem.flights_count; i++) {
-		/* Checks for flights from the specified airport */
 		if (strcmp(airport_key_in(array[i]), airport_id) == 0) {
 			print_flight(array[i]->id, airport_key_out(array[i]),
 						 date_key(array[i]), time_key(array[i]));
@@ -194,9 +190,8 @@ void list_reservations() {
 /* Adds a new reservation to the flight */
 void add_reservation(Flight* flight) {
 	char reservation_id[MAX_CMD_LEN];
-	Reservation *reservation/* , *tmp */;
-	int passengers/* , b = FALSE */;
-	/* ListNode *node, *prev; */
+	Reservation *reservation;
+	int passengers;
 
 	scanf("%s", reservation_id);
 	scanf("%d", &passengers);
@@ -248,7 +243,7 @@ void add_reservation(Flight* flight) {
 void delete_reservation() {
 	char id[MAX_CMD_LEN];
 	int i, found = FALSE;
-	List /* lf,  */*lr;
+	List *lr;
 	Reservation* r;
 	ListNode *node, *prev;
 	Flight* f;
@@ -257,7 +252,7 @@ void delete_reservation() {
 
 	if (strlen(id) < 10) {
 		for(i = 0; i < gbsystem.flights_count; i++) {
-			if (strncmp(gbsystem.flights[i].id, id, 10) == 0) {
+			if (strcmp(gbsystem.flights[i].id, id) == 0) {
 				found = TRUE;
 				delete_flight(i);
 				i--;

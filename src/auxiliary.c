@@ -63,6 +63,7 @@ int get_flight(char id[], Date* date) {
 	return -1;
 }
 
+/* Remove flight from lists */
 int delete_flight(int index) {
 	int i;
 	Flight* flight = &gbsystem.flights[index];
@@ -75,7 +76,6 @@ int delete_flight(int index) {
 
 	gbsystem.flights_count--;
 
-	/* Remove flight from lists */
 	for (i = 0; i < gbsystem.flights_count; i++) {
 		if (gbsystem.dep_flights[i] == flight) {
 			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
@@ -380,29 +380,22 @@ int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity) {
 	int t;
 
-	/* Invalid flight id */
 	if (!isvalid_flight_id(flight_id)) return printf(INVALID_FLIGHT);
 
-	/* Flight already exists */
 	if (get_flight(flight_id, dep_date) >= 0)
 		return printf(FLIGHT_ALREADY_EXISTS);
 
-	/* Invalid airport */
 	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0)
 		return printf(NO_SUCH_AIRPORT, t < 0 ? departure_id : arrival_id);
 
-	/* Max flights exceeded */
 	if (gbsystem.flights_count == MAX_FLIGHTS) return printf(TOO_MANY_FLIGHTS);
 
-	/* Invalid date */
 	if (!isvalid_date(dep_date)) return printf(INVALID_DATE);
 
-	/* Invalid flight duration */
 	if (duration.hours > MAX_DURATION ||
 		(duration.hours == MAX_DURATION && duration.minutes > 0))
 		return printf(INVALID_DURATION);
 
-	/* Invalid flight capacity */
 	if (capacity < MIN_CAPACITY) return printf(INVALID_CAPACITY);
 	return FALSE;
 }
@@ -417,7 +410,6 @@ void insertion_sort(int* is_sorted, Flight* arr[], Date* (*date_key)(Flight*),
 	int i, j;
 	Flight* temp;
 
-	/* If already sorted doesn't do anything */
 	if (*is_sorted) return;
 	*is_sorted = TRUE;
 
@@ -443,6 +435,8 @@ Date* dep_date_key(Flight* flight) { return &flight->dep_date; }
 Date* arr_date_key(Flight* flight) { return &flight->arr_date; }
 Time* dep_time_key(Flight* flight) { return &flight->dep_time; }
 Time* arr_time_key(Flight* flight) { return &flight->arr_time; }
+char* res_key(void* data) { return ((Reservation*)data)->id; }
+char* flight_key(void* data) { return ((Flight*)data)->id; }
 
 /*----------------------
  |       C TYPES      	|
