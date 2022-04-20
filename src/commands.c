@@ -88,7 +88,6 @@ void add_flight() {
 	gbsystem.dep_flights[gbsystem.flights_count] = new_flight;
 	gbsystem.flights_count++;
 
-	hashtable_add(gbsystem.flight_ht, new_flight);
 	gbsystem.is_dep_sorted = FALSE;
 	gbsystem.is_arr_sorted = FALSE;
 }
@@ -170,14 +169,17 @@ void list_reservations() {
 	char flight_id[FLIGHT_ID_LENGTH];
 	Date date;
 	Flight* f;
+	int i;
 
 	scanf("%s", flight_id);
 	read_date(&date);
 
-	if ((f = hashtable_get_flight(gbsystem.flight_ht, flight_id, &date)) == NULL) {
+	if ((i = get_flight(flight_id, &date)) == -1) {
 		printf(NO_SUCH_FLIGHT, flight_id);
 		return;
 	}
+
+	f = &gbsystem.flights[i];
 
 	if (getchar() != '\n')
 		add_reservation(f);
@@ -203,7 +205,7 @@ void add_reservation(Flight* flight) {
 	strcpy(reservation->id, reservation_id);
 	reservation->flight = flight;
 
-	hashtable_add(gbsystem.reservation_ht, reservation);
+	hashtable_add(gbsystem.reservation_ids, reservation);
 	list_insert(&flight->reservations, reservation, NULL);
 
 	flight->taken_seats += reservation->passengers;

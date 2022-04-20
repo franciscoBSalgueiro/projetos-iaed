@@ -98,7 +98,6 @@ typedef struct List {
 typedef struct {
 	List table[HASH_TABLE_SIZE];
 	char* (*key)(void*);
-	int free_mem;
 } HashTable;
 
 typedef struct {
@@ -261,10 +260,9 @@ void list_sort(List* list);
 
 /* hashtable.c */
 int hash(char* v);
-HashTable* hashtable_create(char* (*ht_key)(void*), int free_mem);
+HashTable* hashtable_create(char* (*ht_key)(void*));
 void hashtable_destroy(HashTable* ht);
 void hashtable_remove(HashTable* ht, void* data);
 void hashtable_add(HashTable* ht, void* data);
 int hashtable_contains(HashTable* ht, char* str);
-Flight* hashtable_get_flight(HashTable* ht, char* str, Date* date);
 Flight* hashtable_get(HashTable* ht, char* id);

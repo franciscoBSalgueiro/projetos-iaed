@@ -30,8 +30,7 @@ void* custom_alloc(long unsigned int size) {
 /* Frees all allocated memory */
 void clear_memory() {
 	int i;
-	hashtable_destroy(gbsystem.reservation_ht);
-	hashtable_destroy(gbsystem.flight_ht);
+	hashtable_destroy(gbsystem.reservation_ids);
 	for (i = 0; i < gbsystem.flights_count; i++) {
 		list_destroy(&gbsystem.flights[i].reservations);
 	}
@@ -60,6 +59,16 @@ int get_airport(char id[]) {
 	return -left - 1;
 }
 
+/* returns index of flight or -1 if it doesn't exist */
+int get_flight(char id[], Date* date) {
+	int i;
+	for (i = 0; i < gbsystem.flights_count; i++)
+		if (strcmp(gbsystem.flights[i].id, id) == 0 &&
+			cmp_date(&gbsystem.flights[i].dep_date, date) == 0) {
+			return i;
+		}
+	return -1;
+}
 
 /* returns number of flights by airport */
 int get_num_flights(char* id) {
@@ -143,12 +152,13 @@ int isvalid_flight_id(char* id) {
 
 /* Checks if there are no lowercase letters in the id */
 int isvalid_airport_id(char* id) {
-	for (; *id != '\0' ; id++)
-		if (is_lower(*id)) return FALSE;
+	unsigned int i, l = strlen(id);
+	for (i = 0; i < l; i++)
+		if (is_lower(id[i])) return FALSE;
 	return TRUE;
 }
 
-/* Checks if string is at least 10 char and
+/* Checks if string is longer than 10 char and
  * contains only digits or uppercase letters */
 int isvalid_reservation_id(char* id) {
 	unsigned int i, l;
@@ -430,7 +440,7 @@ int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 
 	if (!isvalid_flight_id(flight_id)) return printf(INVALID_FLIGHT);
 
-	if (hashtable_get_flight(gbsystem.flight_ht, flight_id, dep_date) != NULL)
+	if (get_flight(flight_id, dep_date) >= 0)
 		return printf(FLIGHT_ALREADY_EXISTS);
 
 	if ((t = get_airport(departure_id)) < 0 || get_airport(arrival_id) < 0)
