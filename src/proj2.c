@@ -1,15 +1,14 @@
 /*
- * File:  proj1.c
+ * File:  proj2.c
  * Author:  Francisco Salgueiro
  * Description: Main project file
  */
 
-#include "proj1.h"
+#include "proj2.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-/* System declaration */
 System gbsystem;
 
 /* Initializes the system, waits for user commands then frees used memory */

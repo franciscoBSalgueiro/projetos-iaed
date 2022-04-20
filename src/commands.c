@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "proj1.h"
+#include "proj2.h"
 
 /*----------------------
  |  -A COMMAND
@@ -190,36 +190,14 @@ void list_reservations() {
 /* Adds a new reservation to the flight */
 void add_reservation(Flight* flight) {
 	char reservation_id[MAX_CMD_LEN];
-	Reservation *reservation;
+	Reservation* reservation;
 	int passengers;
 
 	scanf("%s", reservation_id);
 	scanf("%d", &passengers);
 
-	if (!isvalid_reservation_id(reservation_id)) {
-		printf(INVALID_RESERVATION);
+	if (has_error_reservation(passengers, flight, reservation_id) == ERROR)
 		return;
-	}
-
-	if (hashtable_contains(gbsystem.reservation_ids, reservation_id)) {
-		printf(RESERVATION_ALREADY_EXISTS, reservation_id);
-		return;
-	}
-
-	if (flight->taken_seats + passengers > flight->capacity) {
-		printf(TOO_MANY_RESERVATIONS);
-		return;
-	}
-
-	if (!isvalid_date(&flight->dep_date)) {
-		printf(INVALID_DATE);
-		return;
-	}
-
-	if (passengers < 1) {
-		printf(INVALID_PASSENGER);
-		return;
-	}
 
 	reservation = custom_alloc(sizeof(Reservation));
 	reservation->id = custom_alloc(sizeof(char) * (strlen(reservation_id) + 1));
@@ -231,8 +209,6 @@ void add_reservation(Flight* flight) {
 	list_insert(&flight->reservations, reservation, NULL);
 
 	flight->taken_seats += reservation->passengers;
-
-	return;
 }
 
 /*----------------------
@@ -243,35 +219,20 @@ void add_reservation(Flight* flight) {
 void delete_reservation() {
 	char id[MAX_CMD_LEN];
 	int i, found = FALSE;
-	List *lr;
-	Reservation* r;
-	ListNode *node, *prev;
 	Flight* f;
 
 	scanf("%s", id);
 
 	if (strlen(id) < 10) {
-		for(i = 0; i < gbsystem.flights_count; i++) {
+		for (i = 0; i < gbsystem.flights_count; i++)
 			if (strcmp(gbsystem.flights[i].id, id) == 0) {
 				found = TRUE;
 				delete_flight(i);
 				i--;
 			}
-		}
 	} else if ((f = hashtable_get(gbsystem.reservation_ids, id)) != NULL) {
-		lr = &f->reservations;
 		found = TRUE;
-
-		for (node = lr->head, prev = NULL; node != NULL;
-			 prev = node, node = node->next) {
-			r = (Reservation*)node->data;
-			if (strcmp(r->id, id) == 0) {
-				f->taken_seats -= r->passengers;
-				hashtable_remove(gbsystem.reservation_ids, r);
-				list_remove(lr, node, prev);
-				break;
-			}
-		}
+		delete_reservation_id(id, f);
 	}
 	if (!found) printf(NOT_FOUND);
 }

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "proj1.h"
+#include "proj2.h"
 
 /* Creates a new List */
 void list_init(List* list) {
