@@ -1,7 +1,7 @@
 /*
- * File:  proj1.h
+ * File:  proj2.h
  * Author:  Francisco Salgueiro
- * Description: Constants, globals, structs and prototypes for proj1.c
+ * Description: Constants, globals, structs and prototypes for proj2.c
  */
 
 /*----------------------
@@ -29,8 +29,9 @@
 #define NUM_HOURS 24
 #define NUM_MONTHS 12
 
-/* Default initial date */
 #define INITIAL_DATE 1, 1, 2022
+
+#define HASH_TABLE_SIZE 39877
 
 static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
 										   31, 31, 30, 31, 30, 31};
@@ -84,8 +85,6 @@ static const int MONTH_DAYS[NUM_MONTHS] = {31, 28, 31, 30, 31, 30,
  |   STRUCTS 	|
  ---------------*/
 
-#define HASH_TABLE_SIZE 9949
-
 typedef struct ListNode {
 	void* data;
 	struct ListNode* next;
@@ -96,34 +95,29 @@ typedef struct List {
 	ListNode* tail;
 } List;
 
-/* HashTable struct */
 typedef struct {
 	List table[HASH_TABLE_SIZE];
 	char* (*key)(void*);
 	int free_mem;
 } HashTable;
 
-/* Airport struct */
 typedef struct {
 	char id[AIRPORT_ID_LENGTH];
 	char country[MAX_COUNTRY_NAME_LENGTH];
 	char city[MAX_CITY_NAME_LENGTH];
 } Airport;
 
-/* Date struct */
 typedef struct {
 	int day;
 	int month;
 	int year;
 } Date;
 
-/* Time struct */
 typedef struct {
 	int hours;
 	int minutes;
 } Time;
 
-/* Flight struct */
 typedef struct {
 	char id[FLIGHT_ID_LENGTH];
 	Airport* departure;
@@ -138,7 +132,6 @@ typedef struct {
 	int taken_seats;
 } Flight;
 
-/* Reservation struct */
 typedef struct {
 	char* id;
 	int passengers;
@@ -150,25 +143,19 @@ typedef struct {
  -----------------------*/
 
 typedef struct {
-	/* Number of airports and flights added */
 	int airports_count, flights_count;
 
-	/* Airport array sorted by ID */
 	Airport airports[MAX_AIRPORTS];
 
-	/* Flight arrays */
 	Flight flights[MAX_FLIGHTS];
 	Flight* dep_flights[MAX_FLIGHTS]; /* Sorted by departure date */
 	Flight* arr_flights[MAX_FLIGHTS]; /* Sorted by arrival date */
 
-	/* Flag to avoid sorting if no changes were made to the arrays */
 	int is_dep_sorted, is_arr_sorted;
 
-	/* Hash table for reservations */
-	HashTable* reservation_ht;
-	HashTable* flight_ht;
+	HashTable* reservation_ids;
+	HashTable* flight_ids;
 
-	/* Current system date */
 	Date date;
 } System;
 
@@ -178,7 +165,7 @@ extern System gbsystem;
  | FUNCTION PROTOTYPES	|
  -----------------------*/
 
-/* proj1.c */
+/* proj2.c */
 int cmd_triage();
 
 /* commands.c */
@@ -192,21 +179,25 @@ void list_flights(Flight* arr[], char* (*airport_key_in)(Flight*),
 				  char* (*airport_key_out)(Flight*), Date* (*date_key)(Flight*),
 				  Time* (*time_key)(Flight*));
 void change_date();
-int cmp_reservation_id(void* id1, void* id2);
 void list_reservations();
 void add_reservation(Flight* flight);
 void delete_reservation();
 
 /* auxiliary.c */
+void* custom_alloc(long unsigned int size);
+void clear_memory();
+
 int get_airport(char id[]);
-int delete_flight(int index);
-void list_flight_reservations(Flight* flight);
+int get_flight(char id[], Date* date);
 int get_num_flights(char* id);
+
+void array_remove_flight(Flight *arr[], Flight* flight);
+void delete_reservation_id(char* id, Flight* f);
+int delete_flight(int index);
+
 int isvalid_flight_id(char* id);
 int isvalid_airport_id(char* id);
 int isvalid_reservation_id(char* id);
-char* res_key(void* data);
-char* flight_key(void* data);
 
 void init_time(Time* time, int hours, int minutes);
 void init_date(Date* date, int day, int month, int year);
@@ -233,7 +224,10 @@ void print_flight_full(Flight* flight);
 void print_date(Date* date);
 void print_time(Time* time);
 void print_reservation(Reservation* reservation);
+void list_flight_reservations(Flight* flight);
 
+int has_error_reservation(int passengers, Flight* flight,
+						  char* reservation_id);
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
 					 char* departure_id, Time duration, int capacity);
 
@@ -248,6 +242,7 @@ Date* dep_date_key(Flight* flight);
 Date* arr_date_key(Flight* flight);
 Time* dep_time_key(Flight* flight);
 Time* arr_time_key(Flight* flight);
+char* res_key(void* data);
 
 int is_lower(char s);
 int is_upper(char s);

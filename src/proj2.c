@@ -1,18 +1,17 @@
 /*
- * File:  proj1.c
+ * File:  proj2.c
  * Author:  Francisco Salgueiro
  * Description: Main project file
  */
 
-#include "proj1.h"
+#include "proj2.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-/* System declaration */
 System gbsystem;
 
-/* Initializes the system, waits for user commands then clears memory */
+/* Initializes the system, waits for user commands then frees used memory */
 int main() {
 	gbsystem.airports_count = 0;
 	gbsystem.flights_count = 0;
@@ -20,8 +19,7 @@ int main() {
 	gbsystem.is_arr_sorted = FALSE;
 	init_date(&gbsystem.date, INITIAL_DATE);
 
-	gbsystem.reservation_ht = hashtable_create(res_key, TRUE);
-	gbsystem.flight_ht = hashtable_create(flight_key, FALSE);
+	gbsystem.reservation_ids = hashtable_create(res_key);
 
 	while (cmd_triage()) {
 	}

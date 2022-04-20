@@ -8,8 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "proj1.h"
+#include "proj2.h"
 
+/* Hash function for strings */
 int hash(char* v) {
 	int h, a = 31415, b = 27183;
 	for (h = 0; *v != '\0'; v++, a = a * b % (HASH_TABLE_SIZE - 1))
@@ -32,7 +33,6 @@ HashTable* hashtable_create(char* (*ht_key)(void*), int free_mem) {
 	return ht;
 }
 
-
 /* Destroys a HashTable */
 void hashtable_destroy(HashTable* ht) {
 	int i;
@@ -51,7 +51,7 @@ void hashtable_destroy(HashTable* ht) {
 	free(ht);
 }
 
-/* Removes string from HashTable */
+/* Removes element from HashTable */
 void hashtable_remove(HashTable* ht, void* data) {
 	int index = hash(ht->key(data));
 	ListNode* node = ht->table[index].head;
@@ -70,13 +70,13 @@ void hashtable_remove(HashTable* ht, void* data) {
 	}
 }
 
-/* Adds a new string to the HashTable */
+/* Adds a new element to the HashTable */
 void hashtable_add(HashTable* ht, void* data) {
 	int index = hash(ht->key(data));
 	list_add(&ht->table[index], data);
 }
 
-/* Returns true if the HashTable contains the reservation with that id */
+/* Returns true if the HashTable contains the reservation with given id */
 int hashtable_contains(HashTable* ht, char* str) {
 	int index = hash(str);
 	ListNode* node = ht->table[index].head;

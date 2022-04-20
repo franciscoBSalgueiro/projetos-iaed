@@ -1,5 +1,5 @@
 /*
- * File:  aux.c
+ * File:  auxiliary.c
  * Author:  Francisco Salgueiro
  * Description: Auxiliary functions
  */
@@ -9,17 +9,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "proj1.h"
+#include "proj2.h"
 
+/*--------------------------
+ |     MEMORY FUNCTIONS     |
+ ---------------------------*/
+
+/* Allocates memory and ends program with error code if no more memory is
+ * available */
 void* custom_alloc(long unsigned int size) {
 	void* ptr = malloc(size);
 	if (!ptr) {
 		printf(NO_MEMORY);
+		clear_memory();
 		exit(1);
 	}
 	return ptr;
 }
 
+/* Frees all allocated memory */
 void clear_memory() {
 	int i;
 	hashtable_destroy(gbsystem.reservation_ht);
@@ -53,35 +61,63 @@ int get_airport(char id[]) {
 }
 
 
-/* Remove flight from lists */
-int delete_flight(int index) {
+/* returns number of flights by airport */
+int get_num_flights(char* id) {
+	int i, count = 0;
+	for (i = 0; i < gbsystem.flights_count; i++)
+		if (strcmp(gbsystem.flights[i].departure->id, id) == 0) count++;
+	return count;
+}
+
+/*--------------------------
+ |    DELETE FUNCTIONS       |
+ ---------------------------*/
+
+/* Removes flight pointer from ordered flight arrays */
+void array_remove_flight(Flight* arr[], Flight* flight) {
 	int i;
+	for (i = 0; i < gbsystem.flights_count; i++) {
+		if (arr[i] == flight) {
+			memcpy(&arr[i], &arr[i + 1],
+				   (gbsystem.flights_count - i) * sizeof(Flight*));
+			return;
+		}
+	}
+}
+
+/* Deletes reservation with given id in flight */
+void delete_reservation_id(char* id, Flight* f) {
+	Reservation* r;
+	List* lr;
+
+	ListNode *node, *prev;
+	lr = &f->reservations;
+
+	for (node = lr->head, prev = NULL; node != NULL;
+		 prev = node, node = node->next) {
+		r = (Reservation*)node->data;
+		if (strcmp(r->id, id) == 0) {
+			f->taken_seats -= r->passengers;
+			hashtable_remove(gbsystem.reservation_ids, r);
+			list_remove(lr, node, prev);
+			break;
+		}
+	}
+}
+
+/* Remove flight from system lists */
+int delete_flight(int index) {
 	Flight* flight = &gbsystem.flights[index];
 	ListNode* n;
 
-	hashtable_remove(gbsystem.flight_ht, flight);
-	for (n = flight->reservations.head; n != NULL; n = n->next) {
-		hashtable_remove(gbsystem.reservation_ht, n->data);
-	}
+	for (n = flight->reservations.head; n != NULL; n = n->next)
+		hashtable_remove(gbsystem.reservation_ids, n->data);
 	list_destroy(&flight->reservations);
 
 	gbsystem.flights_count--;
 
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.dep_flights[i] == flight) {
-			memcpy(&gbsystem.dep_flights[i], &gbsystem.dep_flights[i + 1],
-				   (gbsystem.flights_count - i) * sizeof(Flight*));
-			break;
-		}
-	}
-
-	for (i = 0; i < gbsystem.flights_count; i++) {
-		if (gbsystem.arr_flights[i] == flight) {
-			memcpy(&gbsystem.arr_flights[i], &gbsystem.arr_flights[i + 1],
-				   (gbsystem.flights_count - i) * sizeof(Flight*));
-			break;
-		}
-	}
+	array_remove_flight(gbsystem.dep_flights, flight);
+	array_remove_flight(gbsystem.arr_flights, flight);
 
 	if (index < gbsystem.flights_count) {
 		memcpy(&gbsystem.flights[index], &gbsystem.flights[index + 1],
@@ -91,32 +127,9 @@ int delete_flight(int index) {
 	return 0;
 }
 
-int cmp_reservation_id(void* id1, void* id2) {
-	return strcmp((char*)id1, (char*)id2);
-}
-
-/* Lists all the reservations from a flight */
-void list_flight_reservations(Flight* flight) {
-	ListNode* n;
-	if (!isvalid_date(&flight->dep_date)) {
-		printf(INVALID_DATE);
-		return;
-	}
-
-	list_sort(&flight->reservations);
-
-	for(n = flight->reservations.head; n != NULL; n = n->next) {
-		print_reservation((Reservation*)n->data);
-	}
-}
-
-/* returns number of flights by airport */
-int get_num_flights(char* id) {
-	int i, count = 0;
-	for (i = 0; i < gbsystem.flights_count; i++)
-		if (strcmp(gbsystem.flights[i].departure->id, id) == 0) count++;
-	return count;
-}
+/*--------------------------
+ |  VALIDATION FUNCTIONS	|
+ ---------------------------*/
 
 /* Checks if the first two letters are uppercase and the rest are digits */
 int isvalid_flight_id(char* id) {
@@ -361,9 +374,54 @@ void print_reservation(Reservation* reservation) {
 	printf(RESERVATION_STRING, reservation->id, reservation->passengers);
 }
 
+/* Lists all the reservations from a flight */
+void list_flight_reservations(Flight* flight) {
+	ListNode* n;
+	if (!isvalid_date(&flight->dep_date)) {
+		printf(INVALID_DATE);
+		return;
+	}
+
+	list_sort(&flight->reservations);
+
+	for (n = flight->reservations.head; n != NULL; n = n->next) {
+		print_reservation((Reservation*)n->data);
+	}
+}
+
 /*----------------------
  |    ERROR FUNCTIONS	|
  -----------------------*/
+
+/* Handles all errors for add_reservation */
+int has_error_reservation(int passengers, Flight* flight,
+						  char* reservation_id) {
+	if (!isvalid_reservation_id(reservation_id)) {
+		printf(INVALID_RESERVATION);
+		return ERROR;
+	}
+
+	if (hashtable_contains(gbsystem.reservation_ids, reservation_id)) {
+		printf(RESERVATION_ALREADY_EXISTS, reservation_id);
+		return ERROR;
+	}
+
+	if (flight->taken_seats + passengers > flight->capacity) {
+		printf(TOO_MANY_RESERVATIONS);
+		return ERROR;
+	}
+
+	if (!isvalid_date(&flight->dep_date)) {
+		printf(INVALID_DATE);
+		return ERROR;
+	}
+
+	if (passengers < 1) {
+		printf(INVALID_PASSENGER);
+		return ERROR;
+	}
+	return 0;
+}
 
 /* Handles all errors for add_flight */
 int has_error_flight(char* flight_id, Date* dep_date, char* arrival_id,
@@ -426,7 +484,6 @@ Date* arr_date_key(Flight* flight) { return &flight->arr_date; }
 Time* dep_time_key(Flight* flight) { return &flight->dep_time; }
 Time* arr_time_key(Flight* flight) { return &flight->arr_time; }
 char* res_key(void* data) { return ((Reservation*)data)->id; }
-char* flight_key(void* data) { return ((Flight*)data)->id; }
 
 /*----------------------
  |       C TYPES      	|
