@@ -18,7 +18,7 @@
 #define MAX_AIRPORTS 40
 
 #define AIRPORT_ID_LENGTH 4
-#define FLIGHT_ID_LENGTH 7
+#define FLIGHT_ID_LENGTH 9
 #define MAX_COUNTRY_NAME_LENGTH 31
 #define MAX_CITY_NAME_LENGTH 51
 
@@ -243,9 +243,10 @@ Time* dep_time_key(Flight* flight);
 Time* arr_time_key(Flight* flight);
 char* res_key(void* data);
 
-int is_lower(char s);
-int is_upper(char s);
-int is_digit(char s);
+int is_letter(char c);
+int is_lower(char c);
+int is_upper(char c);
+int is_digit(char c);
 
 void* custom_alloc(long unsigned int size);
 void clear_memory();

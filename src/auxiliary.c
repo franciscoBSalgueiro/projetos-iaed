@@ -140,13 +140,26 @@ int delete_flight(int index) {
  |  VALIDATION FUNCTIONS	|
  ---------------------------*/
 
-/* Checks if the first two letters are uppercase and the rest are digits */
+/* Checks if id has 2 to 4 uppercase letters followed by a number from 1 to 9999
+ */
 int isvalid_flight_id(char* id) {
 	unsigned int i, l;
+	int i_count = 0, l_count = 0;
+	int changed = FALSE;
 	l = strlen(id);
-	if (l < 3 || l > 6 || !is_upper(id[0]) || !is_upper(id[1])) return FALSE;
-	for (i = 2; i < l; i++)
-		if (!is_digit(id[i])) return FALSE;
+	if (l < 3 || l > 8) return FALSE;
+	for (i = 0; i < l; i++) {
+		if (is_letter(id[i])) {
+			if (changed) return FALSE;
+			l_count++;
+		} else if (is_digit(id[i])) {
+			if (!changed && id[i] == '0') return FALSE;
+			changed = TRUE;
+			i_count++;
+		} else
+			return FALSE;
+	}
+	if (!changed || l_count < 2 || l_count > 4 || i_count > 4) return FALSE;
 	return TRUE;
 }
 
@@ -499,6 +512,9 @@ char* res_key(void* data) { return ((Reservation*)data)->id; }
  |       C TYPES      	|
  -----------------------*/
 
+int is_letter(char c) {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
 int is_lower(char c) { return c >= 'a' && c <= 'z'; }
 int is_upper(char c) { return c >= 'A' && c <= 'Z'; }
 int is_digit(char c) { return c >= '0' && c <= '9'; }

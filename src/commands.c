@@ -135,8 +135,10 @@ void list_flights(Flight* array[], char* (*airport_key_in)(Flight*),
 
 	for (i = 0; i < gbsystem.flights_count; i++) {
 		if (strcmp(airport_key_in(array[i]), airport_id) == 0) {
-			print_flight(array[i]->id, airport_key_out(array[i]),
-						 date_key(array[i]), time_key(array[i]));
+			if (time_key == dep_time_key ||
+				cmp_date(date_key(array[i]), &gbsystem.date) >= 0)
+				print_flight(array[i]->id, airport_key_out(array[i]),
+							 date_key(array[i]), time_key(array[i]));
 		}
 	}
 }
@@ -225,7 +227,8 @@ void delete_reservation() {
 
 	if (strlen(id) < 10) {
 		for (i = 0; i < gbsystem.flights_count; i++)
-			if (strcmp(gbsystem.flights[i].id, id) == 0) {
+			if (strcmp(gbsystem.flights[i].id, id) == 0 &&
+				cmp_date(&gbsystem.flights[i].arr_date, &gbsystem.date) < 0) {
 				found = TRUE;
 				delete_flight(i);
 				i--;
